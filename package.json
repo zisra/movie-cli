@@ -1,0 +1,29 @@
+{
+	"name": "movie-cli",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"start": "tsx ./src/index.ts"
+	},
+	"type": "module",
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"chalk": "^5.2.0",
+		"cheerio": "^1.0.0-rc.12",
+		"cli-progress": "^3.12.0",
+		"crypto-js": "^4.1.1",
+		"nanoid": "^4.0.2",
+		"ofetch": "^1.0.1",
+		"open": "^9.1.0",
+		"prompts": "^2.4.2"
+	},
+	"devDependencies": {
+		"@types/cli-progress": "^3.11.0",
+		"@types/crypto-js": "^4.1.1",
+		"@types/node": "^18.15.11",
+		"@types/prompts": "^2.4.4",
+		"tsx": "^3.12.6"
+	}
+}

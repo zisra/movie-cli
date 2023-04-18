@@ -3,32 +3,33 @@ import { registerProvider } from '../provider';
 
 import { ofetch } from 'ofetch';
 
-const flixHqBase = 'https://api.consumet.org/meta/tmdb';
+const BASE_URL = 'https://api.consumet.org/meta/tmdb';
 
-const execute = async ({ setProgress, movieInfo: { title, year } }) => {
+const execute = async ({
+	setProgress,
+	movieInfo: { title, year, type, season, episode },
+}) => {
 	const searchResults = await ofetch(`/${encodeURIComponent(title)}`, {
-		baseURL: flixHqBase,
+		baseURL: BASE_URL,
 	});
 
 	setProgress(0.4);
 
 	const foundItem = searchResults.results.find((v) => {
-		return (
-			compareTitle(v.title, title) &&
-			v.type === 'Movie' &&
-			v.releaseDate === year
-		);
+		if (v.type !== 'Movie' && v.type !== 'TV Series') return false;
+
+		return compareTitle(v.title, title) && v.releaseDate === year;
 	});
 
 	if (!foundItem) {
 		setProgress(1);
-		throw new Error('No movie found');
+		throw new Error('No stream found');
 	}
 
 	const mediaInfo = await ofetch(`/info/${foundItem.id}`, {
-		baseURL: flixHqBase,
+		baseURL: BASE_URL,
 		params: {
-			type: 'movie',
+			type,
 		},
 	});
 
@@ -36,25 +37,32 @@ const execute = async ({ setProgress, movieInfo: { title, year } }) => {
 
 	if (!mediaInfo.id) {
 		setProgress(1);
-		throw new Error('No movie found');
+		throw new Error('No stream found');
 	}
 
-	const episodeId = mediaInfo.episodeId;
+	let episodeId = mediaInfo.episodeId;
+
+	if (type === 'movie') {
+		episodeId = mediaInfo.episodeId;
+	} else if (type === 'series') {
+		const seasonMedia = mediaInfo.seasons.find((o: any) => o.season === season);
+		episodeId = seasonMedia.episodes.find((o: any) => o.episode === episode).id;
+	}
 
 	if (!episodeId) {
 		setProgress(1);
-		throw new Error('No movie found');
+		throw new Error('No stream found');
 	}
 
 	const watchInfo = await ofetch(`/watch/${episodeId}`, {
-		baseURL: flixHqBase,
+		baseURL: BASE_URL,
 		params: {
 			id: mediaInfo.id,
 		},
 	});
 
 	if (!watchInfo.sources?.length) {
-		throw new Error('No movie found');
+		throw new Error('No stream found');
 	}
 
 	setProgress(1);
@@ -69,6 +77,7 @@ const execute = async ({ setProgress, movieInfo: { title, year } }) => {
 
 registerProvider({
 	name: 'FlixHQ',
+	types: ['movie', 'series'],
 	rank: 3,
 	disabled: false,
 	execute,

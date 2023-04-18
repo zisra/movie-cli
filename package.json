@@ -1,14 +1,14 @@
 {
 	"name": "movie-cli",
 	"version": "1.0.0",
-	"description": "",
+	"description": "CLI app that scrapes movies from multiple sources and allows you to download them",
 	"main": "index.js",
 	"scripts": {
 		"start": "tsx ./src/index.ts"
 	},
 	"type": "module",
-	"author": "",
-	"license": "ISC",
+	"author": "Isra",
+	"license": "MIT",
 	"dependencies": {
 		"chalk": "^5.2.0",
 		"cheerio": "^1.0.0-rc.12",

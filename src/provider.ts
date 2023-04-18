@@ -3,7 +3,8 @@ export interface Provider {
 	rank: number;
 	disabled: boolean;
 	only?: boolean;
-	execute: ({ imdbID, movieInfo, setProgress }) => Promise<
+	types: ('movie' | 'series')[];
+	execute: ({ movieInfo, setProgress }) => Promise<
 		[
 			{
 				quality: number | string;

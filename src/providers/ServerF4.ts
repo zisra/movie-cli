@@ -2,10 +2,10 @@ import { registerProvider } from '../provider';
 import { ofetch } from 'ofetch';
 import { load } from 'cheerio';
 
-const execute = async ({ imdbID, setProgress }) => {
-	const BASE_URL = 'https://api.123movie.cc';
-	const SERVER = 'serverf4';
+const BASE_URL = 'https://api.123movie.cc';
+const SERVER = 'serverf4';
 
+const execute = async ({ movieInfo: { imdbID }, setProgress }) => {
 	const document = await ofetch(BASE_URL + '/imdb.php/', {
 		query: {
 			imdb: imdbID,
@@ -21,7 +21,7 @@ const execute = async ({ imdbID, setProgress }) => {
 
 	if (!iframeSrc) {
 		setProgress(1);
-		throw new Error('No movie found');
+		throw new Error('No stream found');
 	}
 
 	const iframeDocument = await ofetch.raw(iframeSrc, {
@@ -41,11 +41,11 @@ const execute = async ({ imdbID, setProgress }) => {
 	setProgress(1);
 
 	if (!watchInfo.data?.length) {
-		throw new Error('No movie found');
+		throw new Error('No stream found');
 	}
 
 	if (watchInfo.success == false) {
-		throw new Error('No movie found');
+		throw new Error('No stream found');
 	}
 
 	return watchInfo.data.map((video) => ({
@@ -57,6 +57,7 @@ const execute = async ({ imdbID, setProgress }) => {
 registerProvider({
 	name: 'ServerF4',
 	rank: 2,
+	types: ['movie'],
 	disabled: false,
 	execute,
 });

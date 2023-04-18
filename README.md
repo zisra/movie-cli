@@ -4,7 +4,7 @@
 
 ## Description
 
-This is a simple web scraper CLI app that scrapes movies from multiple sources and allows you to download them
+CLI app that scrapes movies and shows from multiple sources and allows you to download them
 
 ## Installation
 
@@ -20,7 +20,7 @@ npm install
 npm start
 ```
 
-You will be prompted to enter the [IMDb](https://imdb.com) ID of the movie you want to download. The program will attempt to find the movie on multiple sources and download it.
+You will be prompted to enter the [IMDb](https://imdb.com) ID of the stram you want to download. The program will attempt to find the movie on multiple sources and download it.
 
 The file format is either `mp4` or `m3u8` depending on the source. In order to play the file, you will need a media player that supports `m3u8` files. I recommend [VLC](https://www.videolan.org/vlc/index.html).
 

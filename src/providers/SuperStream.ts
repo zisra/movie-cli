@@ -79,7 +79,10 @@ const get = (data: object, altApi = false) => {
 	});
 };
 
-const execute = async ({ setProgress, movieInfo: { title, year } }) => {
+const execute = async ({
+	setProgress,
+	movieInfo: { title, year, type, season, episode },
+}) => {
 	const searchQuery = {
 		module: 'Search3',
 		page: '1',
@@ -96,35 +99,66 @@ const execute = async ({ setProgress, movieInfo: { title, year } }) => {
 	);
 
 	if (!superstreamEntry) {
-		setProgress(1);
-		throw new Error('No movie found');
+		setProgress(1.0);
+		throw new Error('No stream found');
 	}
 	const superstreamId = superstreamEntry.id;
 
-	const apiQuery = {
-		uid: '',
-		module: 'Movie_downloadurl_v3',
-		mid: superstreamId,
-		oss: '1',
-		group: '',
-	};
+	if (type === 'movie') {
+		const apiQuery = {
+			uid: '',
+			module: 'Movie_downloadurl_v3',
+			mid: superstreamId,
+			oss: '1',
+			group: '',
+		};
 
-	const watchInfo = (await get(apiQuery)).data;
+		const watchInfo = (await get(apiQuery)).data;
 
-	setProgress(1);
+		setProgress(1);
 
-	if (!watchInfo.data?.length) {
-		throw new Error('No movie found');
+		if (!watchInfo.data?.length) {
+			throw new Error('No stream found');
+		}
+
+		return watchInfo.list.map((item: any) => ({
+			quality: parseInt(item.real_quality),
+			url: item.url,
+		}));
+	} else if (type === 'series') {
+		const apiQuery = {
+			uid: '',
+			module: 'TV_downloadurl_v3',
+			tid: superstreamId,
+			season,
+			episode,
+			oss: '1',
+			group: '',
+		};
+
+		const watchInfo = (await get(apiQuery)).data;
+
+		setProgress(1);
+
+		if (!watchInfo.list?.length) {
+			throw new Error('No stream found');
+		}
+
+		return watchInfo.list
+			.filter((item) => item.url !== '')
+			.map((item: any) => ({
+				quality: parseInt(item.real_quality),
+				url: item.path,
+			}));
+	} else {
+		setProgress(1);
+		throw new Error('No stream found');
 	}
-
-	return watchInfo.list.map((item: any) => ({
-		quality: parseInt(item.real_quality),
-		url: item.url,
-	}));
 };
 
 registerProvider({
 	name: 'SuperStream',
+	types: ['movie', 'series'],
 	rank: 1,
 	disabled: false,
 	execute,

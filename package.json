@@ -1,8 +1,8 @@
 {
 	"name": "movie-cli",
 	"version": "1.0.0",
-	"description": "CLI app that scrapes movies from multiple sources and allows you to download them",
-	"main": "index.js",
+	"description": "CLI app that scrapes movies and shows from multiple sources and allows you to download them",
+	"main": "src/index.ts",
 	"scripts": {
 		"start": "tsx ./src/index.ts"
 	},
@@ -19,6 +19,14 @@
 		"open": "^9.1.0",
 		"prompts": "^2.4.2"
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/zisra/movie-cli.git"
+	},
+	"bugs": {
+		"url": "https://github.com/zisra/movie-cli/issues"
+	},
+	"homepage": "https://github.com/zisra/movie-cli#readme",
 	"devDependencies": {
 		"@types/cli-progress": "^3.11.0",
 		"@types/crypto-js": "^4.1.1",

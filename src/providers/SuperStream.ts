@@ -117,14 +117,16 @@ const execute = async ({
 
 		setProgress(1);
 
-		if (!watchInfo.data?.length) {
+		if (!watchInfo.list?.length) {
 			throw new Error('No stream found');
 		}
 
-		return watchInfo.list.map((item: any) => ({
-			quality: parseInt(item.real_quality),
-			url: item.url,
-		}));
+		return watchInfo.list
+			.filter((item) => item.path !== '')
+			.map((item: any) => ({
+				quality: parseInt(item.real_quality),
+				url: item.path,
+			}));
 	} else if (type === 'series') {
 		const apiQuery = {
 			uid: '',
@@ -145,7 +147,7 @@ const execute = async ({
 		}
 
 		return watchInfo.list
-			.filter((item) => item.url !== '')
+			.filter((item) => item.path !== '')
 			.map((item: any) => ({
 				quality: parseInt(item.real_quality),
 				url: item.path,

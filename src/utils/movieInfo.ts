@@ -12,7 +12,7 @@ export async function movieInfo({ imdbID }) {
 		`http://www.omdbapi.com/?i=${imdbID}&apikey=${config().OMDB_KEY}`
 	);
 
-	if (response === 'False' || type !== 'series') {
+	if (response === 'False') {
 		throw new Error('No movie found with the selected IMDb ID');
 	}
 

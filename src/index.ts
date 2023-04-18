@@ -46,12 +46,16 @@ if (selectedMovie.type === 'movie') {
 		const { selectedSeason } = await prompts({
 			type: 'number',
 			name: 'selectedSeason',
-			message: `Season (1-${selectedMovie.totalSeasons})`,
+			message:
+				selectedMovie.totalSeasons === null
+					? 'No seasons found. Enter season number'
+					: `Season (1-${selectedMovie.totalSeasons})`,
 			min: 1,
-			max: selectedMovie.totalSeasons,
-			validate: (value) =>
-				(value && value > 0 && value <= selectedMovie.totalSeasons) ??
-				'Invalid season',
+			max:
+				selectedMovie.totalSeasons === null
+					? undefined
+					: selectedMovie.totalSeasons,
+			validate: (value) => (value && value > 0) ?? 'Invalid season',
 		});
 
 		const { episodes } = await seasonInfo({
@@ -59,27 +63,46 @@ if (selectedMovie.type === 'movie') {
 			season: selectedSeason,
 		});
 
-		const { selectedEpisode } = await prompts({
-			type: 'select',
-			name: 'selectedEpisode',
-			message: 'Episode',
-			choices: episodes.map((episode, index) => ({
-				title: `${index + 1} • ${episode.title}`,
-				value: episode,
-			})),
-		});
+		let selectedEpisode: any;
+		if (episodes === null) {
+			selectedEpisode = await prompts({
+				type: 'number',
+				name: 'selectedEpisode',
+				message: 'No episodes found. Enter episode number',
+				validate: (value) => (value && value > 0) ?? 'Invalid episode number',
+			});
+
+			selectedEpisode = selectedEpisode.selectedEpisode;
+		} else {
+			selectedEpisode = await prompts({
+				type: 'select',
+				name: 'selectedEpisode',
+				message: 'Episode',
+				choices: episodes.map((episode, index) => ({
+					title: `${index + 1} • ${episode.title}`,
+					value: episode,
+				})),
+			});
+
+			selectedEpisode = selectedEpisode.selectedEpisode;
+		}
 
 		selectedMovie = {
 			type: 'series',
 			title: selectedMovie.title,
 			year: selectedMovie.year.split('–')[0],
 			season: selectedSeason,
-			episode: episodes.map((e) => e.title).indexOf(selectedEpisode.title) + 1,
+			episode:
+				episodes === null
+					? selectedEpisode
+					: episodes.map((e) => e.title).indexOf(selectedEpisode.title) + 1,
 		};
 
 		console.log('\n');
 		console.log(
-			`${selectedMovie.title} • ${selectedMovie.year} • ${selectedEpisode.title}`
+			`${selectedMovie.title} • ${selectedMovie.year} • ${
+				selectedEpisode.title || `Episode ${selectedMovie.episode}`
+			}`
 		);
 	} catch (err) {
 		console.log(error(err.message));

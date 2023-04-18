@@ -95,7 +95,7 @@ const execute = async ({
 	setProgress(0.5);
 
 	const superstreamEntry = searchRes.find(
-		(res: any) => compareTitle(res.title, title) && res.year === Number(year)
+		(res: any) => compareTitle(res.title, title) && res.year == year
 	);
 
 	if (!superstreamEntry) {

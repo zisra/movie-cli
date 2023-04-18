@@ -18,7 +18,7 @@ const execute = async ({
 	const foundItem = searchResults.results.find((v) => {
 		if (v.type !== 'Movie' && v.type !== 'TV Series') return false;
 
-		return compareTitle(v.title, title) && v.releaseDate === year;
+		return compareTitle(v.title, title) && v.releaseDate == year;
 	});
 
 	if (!foundItem) {

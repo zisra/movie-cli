@@ -16,16 +16,12 @@ export async function movieInfo({ imdbID }) {
 		throw new Error('No movie found with the selected IMDb ID');
 	}
 
-	if (type === 'series' && totalSeasons === 'N/A') {
-		throw new Error('No seasons found for the selected IMDb ID');
-	}
-
 	return {
 		title,
 		year,
 		type,
 		response,
-		totalSeasons: parseInt(totalSeasons),
+		totalSeasons: totalSeasons === 'N/A' ? null : parseInt(totalSeasons),
 	};
 }
 
@@ -41,14 +37,16 @@ export async function seasonInfo({ imdbID, season }) {
 	}
 
 	return {
-		episodes: episodes.map((episode) => {
-			{
-				return {
-					title: episode.Title,
-					imdbID: episode.imdbID,
-					released: new Date(episode.Released).getFullYear(),
-				};
-			}
-		}),
+		episodes: episodes
+			? episodes.map((episode) => {
+					{
+						return {
+							title: episode.Title,
+							imdbID: episode.imdbID,
+							released: new Date(episode.Released).getFullYear(),
+						};
+					}
+			  })
+			: null,
 	};
 }

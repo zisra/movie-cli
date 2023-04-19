@@ -1,4 +1,4 @@
-export function normalizeTitle(title: string): string {
+export function normalizeTitle(title: string) {
 	return title
 		.replace(/the movie/i, '')
 		.replace(/the series/i, '')

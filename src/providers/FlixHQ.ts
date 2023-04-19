@@ -1,13 +1,13 @@
-import { compareTitle } from '../utils/compareTitle';
-import { registerProvider } from '../provider';
+import {compareTitle} from '@/utils/compareTitle';
+import {registerProvider} from '../provider';
 
-import { ofetch } from 'ofetch';
+import {ofetch} from 'ofetch';
 
 const BASE_URL = 'https://api.consumet.org/meta/tmdb';
 
 const execute = async ({
 	setProgress,
-	movieInfo: { title, year, type, season, episode },
+	movieInfo: {title, year, type, season, episode},
 }) => {
 	const searchResults = await ofetch(`/${encodeURIComponent(title)}`, {
 		baseURL: BASE_URL,
@@ -15,8 +15,10 @@ const execute = async ({
 
 	setProgress(0.4);
 
-	const foundItem = searchResults.results.find((v) => {
-		if (v.type !== 'Movie' && v.type !== 'TV Series') return false;
+	const foundItem = searchResults.results.find(v => {
+		if (v.type !== 'Movie' && v.type !== 'TV Series') {
+			return false;
+		}
 
 		return compareTitle(v.title, title) && v.releaseDate == year;
 	});
@@ -40,7 +42,7 @@ const execute = async ({
 		throw new Error('No stream found');
 	}
 
-	let episodeId = mediaInfo.episodeId;
+	let {episodeId} = mediaInfo;
 
 	if (type === 'movie') {
 		episodeId = mediaInfo.episodeId;
@@ -68,10 +70,10 @@ const execute = async ({
 	setProgress(1);
 
 	return watchInfo.sources.map(
-		(video: { url: string; quality: string; isM3U8: boolean }) => ({
+		(video: {url: string; quality: string; isM3U8: boolean}) => ({
 			url: video.url,
 			quality: video.quality === 'auto' ? 'Unknown' : parseInt(video.quality),
-		})
+		}),
 	);
 };
 

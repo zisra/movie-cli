@@ -1,15 +1,16 @@
 import { SingleBar, Presets } from 'cli-progress';
 import prompts from 'prompts';
 import chalk from 'chalk';
-import open from 'open';
 
 import { getProviders } from './provider';
-import { movieInfo, seasonInfo } from './utils/movieInfo';
+import { movieInfo, seasonInfo } from '@/utils/movieInfo';
+import { openInBrowser } from './utils/openInBrowser';
 
 // Providers
-import './providers/SuperStream';
-import './providers/ServerF4';
-import './providers/FlixHQ';
+import '@/providers/HDwatched';
+import '@/providers/SuperStream';
+import '@/providers/ServerF4';
+import '@/providers/FlixHQ';
 
 // CLI colors
 const error = chalk.bold.red;
@@ -128,7 +129,7 @@ for (const provider of sortedProviders) {
 	let result: any;
 	const progress = new SingleBar(
 		{
-			format: `{bar} | {percentage}% | {provider} `,
+			format: '{bar} | {percentage}% | {provider} ',
 			emptyOnZero: true,
 			autopadding: true,
 		},
@@ -183,7 +184,7 @@ for (const provider of sortedProviders) {
 					})
 				),
 			});
-			open(selectedStream);
+			openInBrowser(selectedStream);
 			process.exit(0);
 		}
 	}

@@ -16,7 +16,6 @@ const execute = async ({ movieInfo: { imdbID }, setProgress }) => {
 	setProgress(0.4);
 
 	const $ = load(document);
-
 	const iframeSrc = $('iframe').attr('src');
 
 	if (!iframeSrc) {

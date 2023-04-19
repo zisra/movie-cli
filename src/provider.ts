@@ -4,13 +4,24 @@ export interface Provider {
 	disabled: boolean;
 	only?: boolean;
 	types: ('movie' | 'series')[];
-	execute: ({ movieInfo, setProgress }) => Promise<
-		[
-			{
-				quality: number | string;
-				url: string;
-			}
-		]
+	execute: ({
+		movieInfo,
+		setProgress,
+	}: {
+		movieInfo: {
+			name: string;
+			type: 'movie' | 'series';
+			year: number;
+			imdbID: string;
+			season?: number;
+			episode?: number;
+		};
+		setProgress: () => void;
+	}) => Promise<
+		{
+			quality: number;
+			url: string;
+		}[]
 	>;
 }
 

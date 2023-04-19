@@ -1,6 +1,6 @@
 import { registerProvider } from '../provider';
-import { compareTitle } from '../utils/compareTitle';
-import { btoa } from '../utils/base64';
+import { compareTitle } from '@/utils/compareTitle';
+import { btoa } from '@/utils/base64';
 
 import { customAlphabet } from 'nanoid';
 import CryptoJS from 'crypto-js';
@@ -29,13 +29,14 @@ const crypto = {
 				CryptoJS.MD5(str2).toString() + str3 + str
 			).toString();
 		}
+
 		return null;
 	},
 };
 
 const expiry = () => Math.floor(Date.now() / 1000 + 60 * 60 * 12);
 
-const get = (data: object, altApi = false) => {
+const get = async (data: Record<string, unknown>, altApi = false) => {
 	const defaultData = {
 		childmode: '0',
 		app_version: '11.5',
@@ -102,6 +103,7 @@ const execute = async ({
 		setProgress(1.0);
 		throw new Error('No stream found');
 	}
+
 	const superstreamId = superstreamEntry.id;
 
 	if (type === 'movie') {
@@ -124,10 +126,13 @@ const execute = async ({
 		return watchInfo.list
 			.filter((item) => item.path !== '')
 			.map((item: any) => ({
-				quality: parseInt(item.real_quality),
+				quality:
+					item.real_quality === '4K' ? 2160 : parseInt(item.real_quality),
 				url: item.path,
 			}));
-	} else if (type === 'series') {
+	}
+
+	if (type === 'series') {
 		const apiQuery = {
 			uid: '',
 			module: 'TV_downloadurl_v3',
@@ -152,10 +157,10 @@ const execute = async ({
 				quality: parseInt(item.real_quality),
 				url: item.path,
 			}));
-	} else {
-		setProgress(1);
-		throw new Error('No stream found');
 	}
+
+	setProgress(1);
+	throw new Error('No stream found');
 };
 
 registerProvider({

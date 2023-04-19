@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"baseUrl": "./src",
+		"paths": {
+			"@/utils/*": ["utils/*"],
+			"@/providers/*": ["providers/*"]
+		},
+		"target": "esnext",
+		"module": "esnext",
+		"esModuleInterop": true,
+		"moduleResolution": "node",
+		"strict": true
+	}
+}

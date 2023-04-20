@@ -1,4 +1,4 @@
-import { registerProvider } from '../provider';
+import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
 import { compareTitle } from '@/utils/compareTitle';
 import { btoa } from '@/utils/base64';
 
@@ -80,15 +80,18 @@ const get = async (data: Record<string, unknown>, altApi = false) => {
 	});
 };
 
-const execute = async ({
+async function execute({
 	setProgress,
-	movieInfo: { title, year, type, season, episode },
-}) => {
+	movieInfo,
+}: {
+	setProgress: Progress;
+	movieInfo: MovieInfo;
+}) {
 	const searchQuery = {
 		module: 'Search3',
 		page: '1',
 		type: 'all',
-		keyword: title,
+		keyword: movieInfo.title,
 		pagelimit: '20',
 	};
 	const searchRes = (await get(searchQuery, true)).data;
@@ -96,7 +99,8 @@ const execute = async ({
 	setProgress(0.5);
 
 	const superstreamEntry = searchRes.find(
-		(res: any) => compareTitle(res.title, title) && res.year == year
+		(res: any) =>
+			compareTitle(res.title, movieInfo.title) && res.year == movieInfo.year
 	);
 
 	if (!superstreamEntry) {
@@ -106,7 +110,7 @@ const execute = async ({
 
 	const superstreamId = superstreamEntry.id;
 
-	if (type === 'movie') {
+	if (movieInfo.type === MediaType.MOVIE) {
 		const apiQuery = {
 			uid: '',
 			module: 'Movie_downloadurl_v3',
@@ -124,21 +128,19 @@ const execute = async ({
 		}
 
 		return watchInfo.list
-			.filter((item) => item.path !== '')
+			.filter((item: any) => item.path !== '')
 			.map((item: any) => ({
 				quality:
 					item.real_quality === '4K' ? 2160 : parseInt(item.real_quality),
 				url: item.path,
 			}));
-	}
-
-	if (type === 'series') {
+	} else if (movieInfo.type === MediaType.SERIES) {
 		const apiQuery = {
 			uid: '',
 			module: 'TV_downloadurl_v3',
 			tid: superstreamId,
-			season,
-			episode,
+			season: movieInfo.season,
+			episode: movieInfo.episode,
 			oss: '1',
 			group: '',
 		};
@@ -152,20 +154,21 @@ const execute = async ({
 		}
 
 		return watchInfo.list
-			.filter((item) => item.path !== '')
+			.filter((item: any) => item.path !== '')
 			.map((item: any) => ({
-				quality: parseInt(item.real_quality),
+				quality:
+					item.real_quality === '4K' ? 2160 : parseInt(item.real_quality),
 				url: item.path,
 			}));
 	}
 
 	setProgress(1);
 	throw new Error('No stream found');
-};
+}
 
 registerProvider({
 	name: 'SuperStream',
-	types: ['movie', 'series'],
+	types: [MediaType.MOVIE, MediaType.SERIES],
 	rank: 1,
 	disabled: false,
 	execute,

@@ -1,26 +1,34 @@
-import {compareTitle} from '@/utils/compareTitle';
-import {registerProvider} from '../provider';
+import { compareTitle } from '@/utils/compareTitle';
+import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
 
-import {ofetch} from 'ofetch';
+import { ofetch } from 'ofetch';
 
 const BASE_URL = 'https://api.consumet.org/meta/tmdb';
 
-const execute = async ({
+async function execute({
 	setProgress,
-	movieInfo: {title, year, type, season, episode},
-}) => {
-	const searchResults = await ofetch(`/${encodeURIComponent(title)}`, {
-		baseURL: BASE_URL,
-	});
+	movieInfo,
+}: {
+	setProgress: Progress;
+	movieInfo: MovieInfo;
+}) {
+	const searchResults = await ofetch(
+		`/${encodeURIComponent(movieInfo.title)}`,
+		{
+			baseURL: BASE_URL,
+		}
+	);
 
 	setProgress(0.4);
 
-	const foundItem = searchResults.results.find(v => {
+	const foundItem = searchResults.results.find((v: any) => {
 		if (v.type !== 'Movie' && v.type !== 'TV Series') {
 			return false;
 		}
 
-		return compareTitle(v.title, title) && v.releaseDate == year;
+		return (
+			compareTitle(v.title, movieInfo.title) && v.releaseDate == movieInfo.year
+		);
 	});
 
 	if (!foundItem) {
@@ -31,7 +39,7 @@ const execute = async ({
 	const mediaInfo = await ofetch(`/info/${foundItem.id}`, {
 		baseURL: BASE_URL,
 		params: {
-			type,
+			type: movieInfo.type,
 		},
 	});
 
@@ -42,13 +50,17 @@ const execute = async ({
 		throw new Error('No stream found');
 	}
 
-	let {episodeId} = mediaInfo;
+	let { episodeId } = mediaInfo;
 
-	if (type === 'movie') {
+	if (movieInfo.type === MediaType.MOVIE) {
 		episodeId = mediaInfo.episodeId;
-	} else if (type === 'series') {
-		const seasonMedia = mediaInfo.seasons.find((o: any) => o.season === season);
-		episodeId = seasonMedia.episodes.find((o: any) => o.episode === episode).id;
+	} else if (movieInfo.type === 'series') {
+		const seasonMedia = mediaInfo.seasons.find(
+			(o: any) => o.season === movieInfo.season
+		);
+		episodeId = seasonMedia.episodes.find(
+			(o: any) => o.episode === movieInfo.episode
+		).id;
 	}
 
 	if (!episodeId) {
@@ -70,17 +82,17 @@ const execute = async ({
 	setProgress(1);
 
 	return watchInfo.sources.map(
-		(video: {url: string; quality: string; isM3U8: boolean}) => ({
+		(video: { url: string; quality: string; isM3U8: boolean }) => ({
 			url: video.url,
 			quality: video.quality === 'auto' ? 'Unknown' : parseInt(video.quality),
-		}),
+		})
 	);
-};
+}
 
 registerProvider({
 	name: 'FlixHQ',
-	types: ['movie', 'series'],
-	rank: 3,
+	types: [MediaType.MOVIE, MediaType.SERIES],
+	rank: 4,
 	disabled: false,
 	execute,
 });

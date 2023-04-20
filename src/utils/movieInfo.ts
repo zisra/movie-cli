@@ -2,7 +2,7 @@ import { config } from '../config';
 
 import { ofetch } from 'ofetch';
 
-export async function movieInfo({ imdbID }) {
+export async function movieInfo({ imdbID }: { imdbID: string }) {
 	const {
 		Title: title,
 		Year: year,
@@ -10,7 +10,7 @@ export async function movieInfo({ imdbID }) {
 		Type: type,
 		totalSeasons,
 	} = await ofetch(
-		`http://www.omdbapi.com/?i=${imdbID}&apikey=${config().OMDB_KEY}`,
+		`http://www.omdbapi.com/?i=${imdbID}&apikey=${config().OMDB_KEY}`
 	);
 
 	if (response === 'False') {
@@ -26,11 +26,17 @@ export async function movieInfo({ imdbID }) {
 	};
 }
 
-export async function seasonInfo({ imdbID, season }) {
+export async function seasonInfo({
+	imdbID,
+	season,
+}: {
+	imdbID: string;
+	season: number;
+}) {
 	const { Episodes: episodes, response } = await ofetch(
 		`http://www.omdbapi.com/?i=${imdbID}&Season=${season}&apikey=${
 			config().OMDB_KEY
-		}`,
+		}`
 	);
 
 	if (response === 'False') {
@@ -39,15 +45,17 @@ export async function seasonInfo({ imdbID, season }) {
 
 	return {
 		episodes: episodes
-			? episodes.map(episode => {
-				{
-					return {
-						title: episode.Title,
-						imdbID: episode.imdbID,
-						released: new Date(episode.Released).getFullYear(),
-					};
+			? episodes.map(
+				(episode: { Title: string; imdbID: string; Released: string }) => {
+					{
+						return {
+							title: episode.Title,
+							imdbID: episode.imdbID,
+							released: new Date(episode.Released).getFullYear(),
+						};
+					}
 				}
-			})
+			)
 			: null,
 	};
 }

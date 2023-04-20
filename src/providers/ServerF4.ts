@@ -1,14 +1,21 @@
-import { registerProvider } from '../provider';
+import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+
 import { ofetch } from 'ofetch';
 import { load } from 'cheerio';
 
 const BASE_URL = 'https://api.123movie.cc';
 const SERVER = 'serverf4';
 
-const execute = async ({ movieInfo: { imdbID }, setProgress }) => {
+async function execute({
+	setProgress,
+	movieInfo,
+}: {
+	setProgress: Progress;
+	movieInfo: MovieInfo;
+}) {
 	const document = await ofetch(BASE_URL + '/imdb.php/', {
 		query: {
-			imdb: imdbID,
+			imdb: movieInfo.imdbID,
 			server: SERVER,
 		},
 	});
@@ -47,16 +54,16 @@ const execute = async ({ movieInfo: { imdbID }, setProgress }) => {
 		throw new Error('No stream found');
 	}
 
-	return watchInfo.data.map((video) => ({
+	return watchInfo.data.map((video: any) => ({
 		url: video.file,
 		quality: parseInt(video.label),
 	}));
-};
+}
 
 registerProvider({
 	name: 'ServerF4',
-	rank: 2,
-	types: ['movie'],
+	rank: 3,
+	types: [MediaType.MOVIE],
 	disabled: false,
 	execute,
 });

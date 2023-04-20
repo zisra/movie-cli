@@ -1,28 +1,121 @@
+import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+
 import { ofetch } from 'ofetch';
 import { load } from 'cheerio';
 
-import { registerProvider } from '../provider';
-
 const BASE_URL = 'https://www.hdwatched.xyz';
 
-interface MovieSearchList {
-	title: string;
-	id: string;
-	year: number;
+function getStreamFromEmbed(stream: string) {
+	const embedPage = load(stream);
+	const source = embedPage('#vjsplayer > source');
+	if (!source) {
+		throw new Error('No stream found');
+	}
+
+	const streamSrc = source.attr('src');
+	const streamRes = source.attr('res');
+
+	if (!streamSrc || !streamRes) throw new Error('No stream found');
+
+	return {
+		url: streamSrc,
+		quality: parseInt(streamRes),
+	};
 }
 
-async function execute({ setProgress, movieInfo }) {
-	setProgress(20);
+async function fetchMovie({ id }: { id: number }) {
+	const stream = await ofetch(`/embed/${id}`, {
+		baseURL: BASE_URL,
+	});
 
+	const embedPage = load(stream);
+	const source = embedPage('#vjsplayer > source');
+	if (!source) {
+		throw new Error('No stream found');
+	}
+
+	return getStreamFromEmbed(stream);
+}
+
+async function fetchSeries({
+	setProgress,
+	href,
+	season,
+	episode,
+}: {
+	setProgress: Progress;
+	href: string;
+	season: number;
+	episode: number;
+}) {
+	const seriesPage = await ofetch(`${href}?season=${season}`, {
+		baseURL: BASE_URL,
+	});
+
+	const seasonPage = load(seriesPage);
+	const pageElements = seasonPage('div.i-container').toArray();
+
+	const seriesList: {
+		title: string;
+		href: string;
+		id: string;
+	}[] = [];
+	pageElements.forEach((pageElement) => {
+		const href = seasonPage(pageElement).find('a')?.attr('href') || '';
+		const title =
+			seasonPage(pageElement).find('span.content-title')?.text() || '';
+
+		if (!href || !title) {
+			throw new Error('No stream found');
+		}
+
+		seriesList.push({
+			title: title.toString(),
+			href,
+			id: href.split('/')[2], // Format: /free/{id}/{series-slug}-season-{season-number}-episode-{episode-number}
+		});
+	});
+
+	const targetEpisode = seriesList.find(
+		(episodeEl: any) =>
+			episodeEl.title.trim().toLowerCase() === `episode ${episode}`
+	);
+
+	if (!targetEpisode) {
+		throw new Error('No stream found');
+	}
+
+	setProgress(70);
+
+	const stream = await ofetch(`/embed/${targetEpisode.id}`, {
+		baseURL: BASE_URL,
+	});
+
+	const embedPage = load(stream);
+	const source = embedPage('#vjsplayer > source');
+	if (!source) {
+		throw new Error('No stream found');
+	}
+
+	return getStreamFromEmbed(stream);
+}
+
+async function execute({
+	movieInfo,
+	setProgress,
+}: {
+	movieInfo: MovieInfo;
+	setProgress: Progress;
+}) {
 	const search = await ofetch(`/search/${movieInfo.imdbID}`, {
 		baseURL: BASE_URL,
 	});
 
 	const searchPage = load(search);
-	const movieElements = searchPage('div.i-container').toArray();
+	const pageElements = searchPage('div.i-container').toArray();
 
-	const movieSearchList: MovieSearchList[] = [];
-	movieElements.forEach((movieElement) => {
+	const searchList: any = [];
+	pageElements.forEach((movieElement) => {
 		const href = searchPage(movieElement).find('a').attr('href') || '';
 		const title =
 			searchPage(movieElement).find('span.content-title').text() || '';
@@ -37,54 +130,65 @@ async function execute({ setProgress, movieInfo }) {
 				10
 			) || 0;
 
-		movieSearchList.push({
+		searchList.push({
 			title,
 			year,
 			id: href.split('/')[2], // Format: /free/{id}}/{movie-slug} | Example: /free/18804/iron-man-231
+			href: href,
 		});
 	});
 
-	setProgress(50);
+	setProgress(20);
 
-	const targetMovie = movieSearchList.find(
-		(movie) => movie.year === (movieInfo.year ? +movieInfo.year : 0) // Compare year to make the search more robust
+	const targetSource = searchList.find(
+		(source: any) => source.year === (movieInfo.year ? +movieInfo.year : 0)
 	);
 
-	if (!targetMovie) {
+	if (!targetSource) {
 		throw new Error('No stream found');
 	}
 
-	const stream = await ofetch(`/embed/${targetMovie.id}`, {
-		baseURL: BASE_URL,
-	});
+	setProgress(40);
 
-	setProgress(80);
+	if (movieInfo.type === MediaType.SERIES) {
+		const series = await fetchSeries({
+			setProgress,
+			href: targetSource.href,
+			season: movieInfo.season ?? 1,
+			episode: movieInfo.episode ?? 1,
+		});
 
-	const embedPage = load(stream);
-	const source = embedPage('#vjsplayer > source');
-	if (!source) {
-		throw new Error('No stream found');
+		if (!series?.url || !series?.quality) {
+			throw new Error('No stream found');
+		}
+
+		return [
+			{
+				url: series.url,
+				quality: series.quality,
+			},
+		];
+	} else if (movieInfo.type === MediaType.MOVIE) {
+		const movie = await fetchMovie({
+			id: targetSource.id,
+		});
+
+		if (!movie?.url || !movie?.quality) {
+			throw new Error('No stream found');
+		}
+
+		return [
+			{
+				url: movie.url,
+				quality: movie.quality,
+			},
+		];
 	}
-
-	const streamSrc = source.attr('src');
-	const streamRes = source.attr('res');
-
-	if (!streamSrc) {
-		throw new Error('No stream found');
-	}
-
-	return [
-		{
-			quality: parseInt(streamRes),
-			url: streamSrc,
-		},
-	];
 }
 
 registerProvider({
 	name: 'HDwatched',
-	disabled: false,
-	rank: 4,
-	types: ['movie'],
+	rank: 2,
+	types: [MediaType.MOVIE, MediaType.SERIES],
 	execute,
 });

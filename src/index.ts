@@ -2,7 +2,7 @@ import { SingleBar, Presets } from 'cli-progress';
 import prompts from 'prompts';
 import chalk from 'chalk';
 
-import { getProviders } from './provider';
+import { getProviders, MediaType } from './provider';
 import { movieInfo, seasonInfo } from '@/utils/movieInfo';
 import { openInBrowser } from './utils/openInBrowser';
 
@@ -35,11 +35,13 @@ try {
 	selectedMovie = await movieInfo({ imdbID });
 	selectedMovie.imdbID = imdbID;
 } catch (err) {
-	console.log(error(err.message));
-	process.exit(0);
+	if (err instanceof Error) {
+		console.log(error(err.message));
+		process.exit(0);
+	}
 }
 
-if (selectedMovie.type === 'movie') {
+if (selectedMovie.type === MediaType.MOVIE) {
 	console.log('\n');
 	console.log(info(selectedMovie.title + ' • ' + selectedMovie.year));
 } else if (selectedMovie.type === 'series') {
@@ -79,24 +81,34 @@ if (selectedMovie.type === 'movie') {
 				type: 'select',
 				name: 'selectedEpisode',
 				message: 'Episode',
-				choices: episodes.map((episode, index) => ({
-					title: `${index + 1} • ${episode.title}`,
-					value: episode,
-				})),
+				choices: episodes.map(
+					(
+						episode: {
+							title: string;
+						},
+						index: number
+					) => ({
+						title: `E${index + 1} • ${episode.title}`,
+						value: episode,
+					})
+				),
 			});
 
 			selectedEpisode = selectedEpisode.selectedEpisode;
 		}
 
 		selectedMovie = {
-			type: 'series',
+			type: MediaType.SERIES,
 			title: selectedMovie.title,
 			year: selectedMovie.year.split('–')[0],
 			season: selectedSeason,
+			imdbID,
 			episode:
 				episodes === null
 					? selectedEpisode
-					: episodes.map((e) => e.title).indexOf(selectedEpisode.title) + 1,
+					: episodes
+							.map((e: { title: string }) => e.title)
+							.indexOf(selectedEpisode.title) + 1,
 		};
 
 		console.log('\n');
@@ -106,8 +118,10 @@ if (selectedMovie.type === 'movie') {
 			}`
 		);
 	} catch (err) {
-		console.log(error(err.message));
-		process.exit(0);
+		if (err instanceof Error) {
+			console.log(error(err.message));
+			process.exit(0);
+		}
 	}
 } else {
 	console.log(error('Invalid type'));
@@ -143,7 +157,7 @@ for (const provider of sortedProviders) {
 		result = await Promise.race([
 			provider.execute({
 				movieInfo: selectedMovie,
-				setProgress: (updatedProgress: number) => {
+				setProgress: (updatedProgress) => {
 					progress.update(updatedProgress);
 				},
 			}),
@@ -154,15 +168,17 @@ for (const provider of sortedProviders) {
 			}),
 		]);
 	} catch (err) {
-		progress.update(1);
-		console.log(error(err.message));
-		if (
-			err.message !== 'No stream found' &&
-			!err.message.startsWith('Timeout reached')
-		) {
-			console.log('\n');
-			console.error(err.stack);
-			console.log('\n');
+		if (err instanceof Error) {
+			progress.update(1);
+			console.log(error(err.message));
+			if (
+				err.message !== 'No stream found' &&
+				!err.message.startsWith('Timeout reached')
+			) {
+				console.log('\n');
+				console.error(err.stack);
+				console.log('\n');
+			}
 		}
 	} finally {
 		progress.update(1);

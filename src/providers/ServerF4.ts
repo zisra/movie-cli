@@ -26,7 +26,6 @@ async function execute({
 	const iframeSrc = $('iframe').attr('src');
 
 	if (!iframeSrc) {
-		setProgress(1);
 		throw new Error('No stream found');
 	}
 
@@ -43,8 +42,6 @@ async function execute({
 	const watchInfo = await ofetch('https://serverf4.org/api/source/' + id, {
 		method: 'POST',
 	});
-
-	setProgress(1);
 
 	if (!watchInfo.data?.length) {
 		throw new Error('No stream found');

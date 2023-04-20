@@ -32,7 +32,6 @@ async function execute({
 	});
 
 	if (!foundItem) {
-		setProgress(1);
 		throw new Error('No stream found');
 	}
 
@@ -46,7 +45,6 @@ async function execute({
 	setProgress(0.7);
 
 	if (!mediaInfo.id) {
-		setProgress(1);
 		throw new Error('No stream found');
 	}
 
@@ -64,7 +62,6 @@ async function execute({
 	}
 
 	if (!episodeId) {
-		setProgress(1);
 		throw new Error('No stream found');
 	}
 
@@ -78,8 +75,6 @@ async function execute({
 	if (!watchInfo.sources?.length) {
 		throw new Error('No stream found');
 	}
-
-	setProgress(1);
 
 	return watchInfo.sources.map(
 		(video: { url: string; quality: string; isM3U8: boolean }) => ({

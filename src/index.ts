@@ -1,4 +1,4 @@
-import { SingleBar, Presets } from 'cli-progress';
+import { MultiBar, Presets } from 'cli-progress';
 import prompts from 'prompts';
 import chalk from 'chalk';
 
@@ -107,8 +107,8 @@ if (selectedMovie.type === MediaType.MOVIE) {
 				episodes === null
 					? selectedEpisode
 					: episodes
-							.map((e: { title: string }) => e.title)
-							.indexOf(selectedEpisode.title) + 1,
+						.map((e: { title: string }) => e.title)
+						.indexOf(selectedEpisode.title) + 1,
 		};
 
 		console.log('\n');
@@ -139,18 +139,21 @@ if (hasOnlyproviders) {
 	sortedProviders = sortedProviders.filter((p) => p.only);
 }
 
+const progressBar = new MultiBar(
+	{
+		clearOnComplete: false,
+		format: '{bar} | {percentage}% | {provider} | {status}',
+		emptyOnZero: true,
+		autopadding: true,
+	},
+	Presets.rect
+);
+
 for (const provider of sortedProviders) {
 	let result: any;
-	const progress = new SingleBar(
-		{
-			format: '{bar} | {percentage}% | {provider} ',
-			emptyOnZero: true,
-			autopadding: true,
-		},
-		Presets.rect
-	);
-	progress.start(1, 0, {
-		provider: info(provider.name),
+	const progress = progressBar.create(1, 0, {
+		provider: provider.name,
+		status: 'Searching...',
 	});
 
 	try {
@@ -169,22 +172,19 @@ for (const provider of sortedProviders) {
 		]);
 	} catch (err) {
 		if (err instanceof Error) {
-			progress.update(1);
-			console.log(error(err.message));
+			progress.update(1, { status: error(err.message) });
+			progressBar.stop();
 			if (
 				err.message !== 'No stream found' &&
 				!err.message.startsWith('Timeout reached')
 			) {
-				console.log('\n');
 				console.error(err.stack);
-				console.log('\n');
 			}
 		}
 	} finally {
-		progress.update(1);
-
 		if (result) {
-			console.log(success('Movie found'));
+			progress.update(1, { status: success('Done') });
+			progressBar.stop();
 			console.log('\n');
 			const { selectedStream } = await prompts({
 				type: 'select',

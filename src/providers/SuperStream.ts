@@ -104,7 +104,6 @@ async function execute({
 	);
 
 	if (!superstreamEntry) {
-		setProgress(1.0);
 		throw new Error('No stream found');
 	}
 
@@ -120,8 +119,6 @@ async function execute({
 		};
 
 		const watchInfo = (await get(apiQuery)).data;
-
-		setProgress(1);
 
 		if (!watchInfo.list?.length) {
 			throw new Error('No stream found');
@@ -147,8 +144,6 @@ async function execute({
 
 		const watchInfo = (await get(apiQuery)).data;
 
-		setProgress(1);
-
 		if (!watchInfo.list?.length) {
 			throw new Error('No stream found');
 		}
@@ -162,7 +157,6 @@ async function execute({
 			}));
 	}
 
-	setProgress(1);
 	throw new Error('No stream found');
 }
 

@@ -85,7 +85,7 @@ async function fetchSeries({
 		throw new Error('No stream found');
 	}
 
-	setProgress(70);
+	setProgress(0.7);
 
 	const stream = await ofetch(`/embed/${targetEpisode.id}`, {
 		baseURL: BASE_URL,
@@ -138,7 +138,7 @@ async function execute({
 		});
 	});
 
-	setProgress(20);
+	setProgress(0.2);
 
 	const targetSource = searchList.find(
 		(source: any) => source.year === (movieInfo.year ? +movieInfo.year : 0)
@@ -148,7 +148,7 @@ async function execute({
 		throw new Error('No stream found');
 	}
 
-	setProgress(40);
+	setProgress(0.4);
 
 	if (movieInfo.type === MediaType.SERIES) {
 		const series = await fetchSeries({

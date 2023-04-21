@@ -59,3 +59,45 @@ export async function seasonInfo({
 			: null,
 	};
 }
+
+export async function searchMovie({ query }: { query: string }): Promise<
+	{
+		title: string;
+		year: string;
+		imdbID: string;
+		type: string;
+	}[]
+> {
+	const { Search: search, Error: error } = await ofetch(
+		`http://www.omdbapi.com/?s=${query}&apikey=${config().OMDB_KEY}`
+	);
+
+	if (error) {
+		throw new Error(error);
+	}
+
+	if (!search) {
+		throw new Error('No movies found with the selected query');
+	}
+
+	return search.map(
+		({
+			Title: title,
+			Year: year,
+			imdbID,
+			Type: type,
+		}: {
+			Title: string;
+			Year: string;
+			imdbID: string;
+			Type: string;
+		}) => {
+			return {
+				title,
+				year,
+				imdbID,
+				type,
+			};
+		}
+	);
+}

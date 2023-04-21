@@ -16,6 +16,7 @@
 		"linebreak-style": ["error", "unix"],
 		"quotes": ["error", "single"],
 		"semi": ["error", "always"],
-		"object-curly-spacing": ["error", "always"]
+		"object-curly-spacing": ["error", "always"],
+		"prefer-template": "error"
 	}
 }

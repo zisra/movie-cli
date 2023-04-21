@@ -3,7 +3,8 @@
 		"baseUrl": "./src",
 		"paths": {
 			"@/utils/*": ["utils/*"],
-			"@/providers/*": ["providers/*"]
+			"@/providers/*": ["providers/*"],
+			"@/actions/*": ["actions/*"]
 		},
 		"target": "esnext",
 		"module": "esnext",

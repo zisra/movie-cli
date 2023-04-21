@@ -184,19 +184,27 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 				const { selectedStream } = await prompts({
 					type: 'select',
 					name: 'selectedStream',
-					message: 'Quality',
-					choices: result.map(
-						(item: { quality: number | string; url: string }) => ({
-							title:
-								typeof item.quality === 'number'
-									? `${item.quality}p`
-									: item.quality,
-							value: item.url,
-						})
-					),
+					message: 'Download stream',
+					choices: [
+						{
+							title: info('Skip'),
+							value: 'skip',
+						},
+						...result.map(
+							(item: { quality: number | string; url: string }) => ({
+								title:
+									typeof item.quality === 'number'
+										? `${item.quality}p`
+										: item.quality,
+								value: item.url,
+							})
+						),
+					],
 				});
-				openInBrowser(selectedStream);
-				process.exit(0);
+				if (selectedStream !== 'skip') {
+					openInBrowser(selectedStream);
+					process.exit(0);
+				}
 			}
 		}
 	}

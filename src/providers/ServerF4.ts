@@ -29,12 +29,17 @@ async function execute({
 		throw new Error('No stream found');
 	}
 
-	const iframeDocument = await ofetch.raw(iframeSrc, {
-		headers: {
-			Referer: BASE_URL,
-		},
-	});
+	let iframeDocument;
 
+	try {
+		iframeDocument = await ofetch.raw(iframeSrc, {
+			headers: {
+				Referer: BASE_URL,
+			},
+		});
+	} catch (err) {
+		throw new Error('No stream found');
+	}
 	setProgress(0.7);
 
 	const id = iframeDocument.url.split('/v/')[1];

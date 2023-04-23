@@ -1,8 +1,6 @@
 import fs from 'node:fs';
 
-export function config(): {
-	OMDB_KEY: string;
-	} {
+export function config(): any {
 	let secrets = {};
 	if (fs.existsSync('.env')) {
 		const envFile = fs.readFileSync('.env', 'utf8');

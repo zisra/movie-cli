@@ -5,13 +5,14 @@ import chalk from 'chalk';
 
 import { getProviders, MediaType } from '../provider';
 import { movieInfo, seasonInfo } from '@/utils/movieInfo';
-import { openInBrowser } from '../utils/openInBrowser';
+import { openInBrowser } from '@/utils/openInBrowser';
 
 // Providers
 import '@/providers/HDwatched';
 import '@/providers/SuperStream';
 import '@/providers/ServerF4';
 import '@/providers/FlixHQ';
+import '@/providers/WatchAMovie';
 
 // CLI colors
 const error = chalk.bold.red;
@@ -19,7 +20,7 @@ const success = chalk.bold.green;
 const info = chalk.bold;
 
 // Timeout in milliseconds
-const TIMEOUT_MS = 20000; // 20 seconds
+const TIMEOUT_MS = 20000;
 
 export async function downloadMovie({ imdbID }: { imdbID: string }) {
 	const providers = getProviders();
@@ -173,6 +174,7 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 					err.message !== 'No stream found' &&
 					!err.message.startsWith('Timeout reached')
 				) {
+					// Un-comment to debug
 					// console.log(err.stack);
 				}
 			}
@@ -187,7 +189,7 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 					message: 'Download stream',
 					choices: [
 						{
-							title: info('Skip'),
+							title: info('➜ Skip'),
 							value: 'skip',
 						},
 						...result.map(

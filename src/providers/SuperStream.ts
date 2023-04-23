@@ -10,7 +10,7 @@ const nanoid = customAlphabet('0123456789abcdef', 32);
 
 const iv = 'wEiphTn!';
 const key = '123d6cedf626dy54233aa1w6';
-const apiUrls = [
+const BASE_URLS = [
 	'https://showbox.shegu.net/api/api_client/index/',
 	'https://mbpapi.shegu.net/api/api_client/index/',
 ];
@@ -68,7 +68,7 @@ const get = async (data: Record<string, unknown>, altApi = false) => {
 	formatted.append('version', '129');
 	formatted.append('medium', 'Website');
 
-	const requestUrl = altApi ? apiUrls[1] : apiUrls[0];
+	const requestUrl = altApi ? BASE_URLS[1] : BASE_URLS[0];
 	return ofetch(requestUrl, {
 		method: 'POST',
 		parseResponse: JSON.parse,
@@ -128,7 +128,7 @@ async function execute({
 			.filter((item: any) => item.path !== '')
 			.map((item: any) => ({
 				quality:
-					item.real_quality === '4K' ? 2160 : parseInt(item.real_quality),
+					item.real_quality === '4K' ? '4k' : parseInt(item.real_quality),
 				url: item.path,
 			}));
 	} else if (movieInfo.type === MediaType.SERIES) {
@@ -152,7 +152,7 @@ async function execute({
 			.filter((item: any) => item.path !== '')
 			.map((item: any) => ({
 				quality:
-					item.real_quality === '4K' ? 2160 : parseInt(item.real_quality),
+					item.real_quality === '4K' ? '4k' : parseInt(item.real_quality),
 				url: item.path,
 			}));
 	}

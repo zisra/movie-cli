@@ -101,3 +101,20 @@ export async function searchMovie({ query }: { query: string }): Promise<
 		}
 	);
 }
+
+export async function convertId(imdbID: string) {
+	// convert imdbID to tmdbID
+	const response = await ofetch(
+		`https://api.themoviedb.org/3/find/${imdbID}?api_key=${
+			config().TMDB_KEY
+		}&language=en-US&external_source=imdb_id`
+	);
+
+	if (response.movie_results.length) {
+		return response.movie_results[0].id;
+	} else if (response.tv_results.length) {
+		return response.tv_results[0].id;
+	} else {
+		throw new Error('No movie found with the selected IMDb ID');
+	}
+}

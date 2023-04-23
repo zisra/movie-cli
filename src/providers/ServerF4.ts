@@ -13,7 +13,7 @@ async function execute({
 	setProgress: Progress;
 	movieInfo: MovieInfo;
 }) {
-	const document = await ofetch(`${BASE_URL  }/imdb.php/`, {
+	const document = await ofetch(`${BASE_URL}/imdb.php/`, {
 		query: {
 			imdb: movieInfo.imdbID,
 			server: SERVER,
@@ -44,7 +44,7 @@ async function execute({
 
 	const id = iframeDocument.url.split('/v/')[1];
 
-	const watchInfo = await ofetch(`https://serverf4.org/api/source/${  id}`, {
+	const watchInfo = await ofetch(`https://serverf4.org/api/source/${id}`, {
 		method: 'POST',
 	});
 
@@ -64,8 +64,8 @@ async function execute({
 
 registerProvider({
 	name: 'ServerF4',
-	rank: 3,
+	rank: 100,
 	types: [MediaType.MOVIE],
-	disabled: false,
+	disabled: true,
 	execute,
 });

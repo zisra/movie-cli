@@ -8,7 +8,7 @@ const { mode } = await prompts({
 	message: 'Select mode',
 	choices: [
 		{ title: 'Search', value: 'search' },
-		{ title: 'Download from IMDb', value: 'download' },
+		{ title: 'From IMDb ID', value: 'download' },
 	],
 });
 

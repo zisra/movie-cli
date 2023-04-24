@@ -13,6 +13,8 @@ async function execute({
 	const tmdbID = await convertId(movieInfo.imdbID);
 	let url: string;
 
+	setProgress(0.5);
+
 	if (movieInfo.type === MediaType.MOVIE) {
 		url = `${BASE_URL}/Movies/${tmdbID}/${tmdbID}.m3u8`;
 	} else if (movieInfo.type === MediaType.SERIES) {
@@ -31,7 +33,7 @@ async function execute({
 
 registerProvider({
 	name: 'WatchAMovie',
-	rank: 3,
+	rank: 4,
 	types: [MediaType.MOVIE, MediaType.SERIES],
 	disabled: false,
 	execute,

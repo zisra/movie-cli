@@ -87,7 +87,7 @@ async function execute({
 registerProvider({
 	name: 'FlixHQ',
 	types: [MediaType.MOVIE, MediaType.SERIES],
-	rank: 4,
+	rank: 5,
 	disabled: false,
 	execute,
 });

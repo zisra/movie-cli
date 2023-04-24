@@ -29,6 +29,8 @@ async function execute({
 			throw new Error('No stream found');
 		}
 
+		setProgress(0.5);
+
 		const $ = load(episodesDocument);
 		const allEpisodes = $('.file > td > span > a')
 			.toArray()
@@ -69,6 +71,8 @@ async function execute({
 			throw new Error('No stream found');
 		}
 
+		setProgress(0.5);
+
 		const $ = load(moviesDocument);
 
 		const streams = $('.file > td > span > a')
@@ -93,6 +97,5 @@ registerProvider({
 	rank: 3,
 	types: [MediaType.MOVIE, MediaType.SERIES],
 	disabled: false,
-	only: true,
 	execute,
 });

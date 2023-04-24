@@ -39,7 +39,7 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 	}
 
 	if (selectedMovie.type === MediaType.MOVIE) {
-		console.log('\n');
+		console.log('');
 		console.log(info(selectedMovie.title + ' • ' + selectedMovie.year));
 	} else if (selectedMovie.type === MediaType.SERIES) {
 		try {
@@ -104,11 +104,11 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 					episodes === null
 						? selectedEpisode
 						: episodes
-								.map((e: { title: string }) => e.title)
-								.indexOf(selectedEpisode.title) + 1,
+							.map((e: { title: string }) => e.title)
+							.indexOf(selectedEpisode.title) + 1,
 			};
 
-			console.log('\n');
+			console.log('');
 			console.log(
 				`${selectedMovie.title} • ${selectedMovie.year} • ${
 					selectedEpisode.title || `Episode ${selectedMovie.episode}`
@@ -183,7 +183,7 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 			if (result) {
 				progress.update(1, { status: success('Done') });
 				progressBar.stop();
-				console.log('\n');
+				console.log('');
 				const { selectedStream } = await prompts({
 					type: 'select',
 					name: 'selectedStream',
@@ -212,7 +212,7 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 		}
 	}
 
-	console.log('\n');
+	console.log('');
 	console.log(error('All providers failed'));
 	process.exit(1);
 }

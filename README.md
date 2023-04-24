@@ -23,7 +23,7 @@ npm start
 - If you select the "Search" option, you will be able to search for a movie or show.
 - If you select the "Download IMDb" option, you will be prompted to enter the [IMDb](https://imdb.com) ID of the stream you want to download. The program will attempt to find the movie on multiple sources and download it.
 
-The file format is either `mp4` or `m3u8` depending on the source. In order to play the file, you will need a media player that supports `m3u8` files. I recommend [VLC](https://www.videolan.org/vlc/index.html).
+The file format is either `mp4`, `m3u8`, or `mkv`, depending on the source. Playing `mp4` files should be easy, but some other formats may not be supported. I recommend [VLC](https://www.videolan.org/vlc/index.html) (Cross-platform) or [IINA](https://iina.io/) (MacOS).
 
 ## Contributing
 

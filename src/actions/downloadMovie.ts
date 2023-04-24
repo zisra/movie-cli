@@ -13,6 +13,7 @@ import '@/providers/SuperStream';
 import '@/providers/ServerF4';
 import '@/providers/FlixHQ';
 import '@/providers/WatchAMovie';
+import '@/providers/Moo';
 
 // CLI colors
 const error = chalk.bold.red;
@@ -103,8 +104,8 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 					episodes === null
 						? selectedEpisode
 						: episodes
-							.map((e: { title: string }) => e.title)
-							.indexOf(selectedEpisode.title) + 1,
+								.map((e: { title: string }) => e.title)
+								.indexOf(selectedEpisode.title) + 1,
 			};
 
 			console.log('\n');

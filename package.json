@@ -14,7 +14,8 @@
 	"scripts": {
 		"start": "tsx ./src/index.ts",
 		"lint": "eslint ./src/**/*.ts",
-		"lint:fix": "eslint ./src/**/*.ts --fix"
+		"lint:fix": "eslint ./src/**/*.ts --fix",
+		"refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
 	},
 	"type": "module",
 	"author": "Isra",

@@ -52,7 +52,7 @@ async function execute({
 
 	if (movieInfo.type === MediaType.MOVIE) {
 		episodeId = mediaInfo.episodeId;
-	} else if (movieInfo.type === 'series') {
+	} else {
 		const seasonMedia = mediaInfo.seasons.find(
 			(o: any) => o.season === movieInfo.season
 		);

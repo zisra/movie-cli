@@ -10,10 +10,11 @@ import { openInBrowser } from '@/utils/openInBrowser';
 // Providers
 import '@/providers/HDwatched';
 import '@/providers/SuperStream';
-import '@/providers/ServerF4';
+import '@/providers/ServerF4'; // Disabled
 import '@/providers/FlixHQ';
 import '@/providers/WatchAMovie';
 import '@/providers/Moo';
+import '@/providers/2embed';
 
 // CLI colors
 const error = chalk.bold.red;

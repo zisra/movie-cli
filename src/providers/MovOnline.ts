@@ -1,8 +1,8 @@
 import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+import { compareTitle } from '@/utils/compareTitle';
 
 import { ofetch } from 'ofetch';
 import { load } from 'cheerio';
-import { compareTitle } from '@/utils/compareTitle';
 
 const BASE_URL = 'https://www.mov.onl';
 

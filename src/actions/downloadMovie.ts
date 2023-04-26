@@ -15,6 +15,7 @@ import '@/providers/WatchAMovie';
 import '@/providers/Moo';
 import '@/providers/2embed';
 import '@/providers/MovOnline';
+import '@/providers/WapFever';
 
 // CLI colors
 const error = chalk.bold.red;

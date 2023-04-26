@@ -17,6 +17,7 @@
 		"quotes": ["error", "single"],
 		"semi": ["error", "always"],
 		"object-curly-spacing": ["error", "always"],
-		"prefer-template": "error"
+		"prefer-template": "error",
+		"@typescript-eslint/no-explicit-any": "off"
 	}
 }

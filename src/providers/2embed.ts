@@ -1,10 +1,10 @@
+import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+
 import Utf8 from 'crypto-js/enc-utf8';
 import Base64 from 'crypto-js/enc-base64';
 import AES from 'crypto-js/aes';
 import { ofetch } from 'ofetch';
 import { load } from 'cheerio';
-
-import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
 
 const BASE_URL = 'https://www.2embed.to';
 
@@ -191,7 +191,7 @@ async function execute({
 
 registerProvider({
 	name: '2embed',
-	rank: 6,
+	rank: 5,
 	types: [MediaType.MOVIE, MediaType.SERIES],
 	execute,
 });

@@ -122,7 +122,6 @@ registerProvider({
 	name: 'WapFever',
 	rank: 8,
 	types: [MediaType.MOVIE, MediaType.SERIES],
-	only: true,
 	disabled: false,
 	execute,
 });

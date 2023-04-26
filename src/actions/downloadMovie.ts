@@ -14,7 +14,7 @@ import '@/providers/FlixHQ';
 import '@/providers/WatchAMovie';
 import '@/providers/Moo';
 import '@/providers/2embed';
-import '@/providers/MovOnl';
+import '@/providers/MovOnline';
 
 // CLI colors
 const error = chalk.bold.red;
@@ -140,7 +140,7 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 	const progressBar = new MultiBar(
 		{
 			clearOnComplete: false,
-			format: '{bar} | {percentage}% | {provider} | {status}',
+			format: '\033[0m{bar} | {percentage}% | {provider} | {status}',
 			emptyOnZero: true,
 			autopadding: true,
 		},

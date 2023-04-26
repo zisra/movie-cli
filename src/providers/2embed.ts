@@ -38,7 +38,9 @@ async function fetchCaptchaToken(
 	const $ = load(recaptchaAnchor);
 	const cToken = $('#recaptcha-token').attr('value');
 
-	if (!cToken) throw new Error('Unable to find cToken');
+	if (!cToken) {
+		throw new Error('Unable to find cToken');
+	}
 
 	const payload = {
 		v: vToken,
@@ -91,7 +93,9 @@ async function extractRabbitstream(
 	const dataPath = url.pathname.split('/');
 	const dataId = dataPath[dataPath.length - 1];
 
-	if (!dataId) throw new Error('Unable to get vidcloud data id');
+	if (!dataId) {
+		throw new Error('No stream found');
+	}
 	const ajaxUrl = `${url.protocol}//${url.hostname}/ajax/embed-4/getSources?id=${dataId}`;
 
 	const extractedData = await ofetch(ajaxUrl, {
@@ -179,7 +183,9 @@ async function execute({
 
 	const streamUrl = streamData.sources[0]?.file;
 
-	if (!streamUrl) throw new Error('Unable to get streamUrl');
+	if (!streamUrl) {
+		throw new Error('No stream found');
+	}
 
 	return [
 		{

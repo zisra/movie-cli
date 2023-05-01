@@ -14,8 +14,9 @@ import '@/providers/FlixHQ';
 import '@/providers/WatchAMovie';
 import '@/providers/Moo';
 import '@/providers/2embed';
-import '@/providers/MovOnline';
+import '@/providers/MovOnl';
 import '@/providers/WapFever';
+import '@/providers/XeMovie';
 
 // CLI colors
 const error = chalk.bold.red;
@@ -106,8 +107,8 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 					episodes === null
 						? selectedEpisode
 						: episodes
-								.map((e: { title: string }) => e.title)
-								.indexOf(selectedEpisode.title) + 1,
+							.map((e: { title: string }) => e.title)
+							.indexOf(selectedEpisode.title) + 1,
 			};
 
 			console.log('');

@@ -56,6 +56,11 @@ async function execute({
 		const seasonMedia = mediaInfo.seasons.find(
 			(o: any) => o.season === movieInfo.season
 		);
+
+		if (!seasonMedia?.episodes) {
+			throw new Error('No stream found');
+		}
+
 		episodeId = seasonMedia.episodes.find(
 			(o: any) => o.episode === movieInfo.episode
 		).id;

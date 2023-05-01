@@ -111,7 +111,7 @@ async function execute({
 
 		return [
 			{
-				url: videoDocument('source').attr('src'),
+				url: videoDocument('source').attr('src')?.toString(),
 				quality: 'Unknown',
 			},
 		];

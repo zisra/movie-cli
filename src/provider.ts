@@ -25,13 +25,8 @@ export interface Provider {
 		setProgress,
 	}: {
 		movieInfo: MovieInfo;
-		setProgress: (updatedProgress: number) => void;
-	}) => Promise<
-		{
-			quality: number;
-			url: string;
-		}[]
-	>;
+		setProgress: Progress;
+	}) => Promise<{ quality: number | string; url: string }[]>;
 }
 
 const providers = [] as Provider[];

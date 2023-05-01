@@ -12,7 +12,9 @@ async function execute({
 	setProgress: Progress;
 	movieInfo: MovieInfo;
 }) {
-	const tmdbID = await convertId(movieInfo.imdbID);
+	const tmdbID = await convertId(movieInfo.imdbID).catch(() => {
+		throw new Error('No stream found');
+	});
 	let url: string;
 
 	setProgress(0.5);

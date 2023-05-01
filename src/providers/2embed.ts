@@ -89,7 +89,6 @@ async function extractRabbitstream(
 ): Promise<RabbitStreamData> {
 	const url = new URL(rabbitstreamRes.link);
 
-	// Link format: https://rabbitstream.net/embed-4/{data-id}?z=
 	const dataPath = url.pathname.split('/');
 	const dataId = dataPath[dataPath.length - 1];
 
@@ -161,7 +160,7 @@ async function execute({
 	const siteKey = embedPage('body').attr('data-recaptcha-key');
 
 	if (!siteKey) {
-		throw new Error('No captcha key found');
+		throw new Error('No stream found');
 	}
 
 	const captchaToken = await fetchCaptchaToken(siteKey.toString(), {
@@ -198,6 +197,7 @@ async function execute({
 registerProvider({
 	name: '2embed',
 	rank: 5,
+	disabled: false,
 	types: [MediaType.MOVIE, MediaType.SERIES],
 	execute,
 });

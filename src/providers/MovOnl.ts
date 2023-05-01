@@ -19,6 +19,10 @@ async function execute({
 
 	setProgress(0.7);
 
+	if (!search.feed.entry) {
+		throw new Error('No stream found');
+	}
+
 	const stream = search.feed.entry
 		.map((entry: any) => {
 			const document = load(entry.content['$t']);
@@ -43,7 +47,7 @@ async function execute({
 	}
 	return [
 		{
-			url: stream.url,
+			url: stream.url.toString(),
 			quality: 'Unknown',
 		},
 	];

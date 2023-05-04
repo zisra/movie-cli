@@ -35,7 +35,7 @@ async function execute({
 		throw new Error('No stream found');
 	}
 
-	const mediaInfo = await ofetch(`/info/${foundItem.id}`, {
+	const mediaInfo = await ofetch(`/info/${foundItem?.id}`, {
 		baseURL: BASE_URL,
 		params: {
 			type: titleInfo.type,
@@ -44,7 +44,7 @@ async function execute({
 
 	setProgress(0.7);
 
-	if (!mediaInfo.id) {
+	if (!mediaInfo?.id) {
 		throw new Error('No stream found');
 	}
 
@@ -63,7 +63,11 @@ async function execute({
 
 		episodeId = seasonMedia.episodes.find(
 			(o: any) => o.episode === titleInfo.episode
-		).id;
+		)?.id;
+
+		if (!episodeId) {
+			throw new Error('No stream found');
+		}
 	}
 
 	if (!episodeId) {

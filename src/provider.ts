@@ -12,6 +12,7 @@ export interface TitleInfo {
 	}[];
 	season?: number;
 	episode?: number;
+	episodeTitle?: string;
 }
 
 export type Progress = (updatedProgress: number) => void;

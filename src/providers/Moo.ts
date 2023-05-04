@@ -1,6 +1,7 @@
 import { registerProvider, TitleInfo, Progress, MediaType } from '../provider';
 import { trailingZero } from '@/utils/trailingZero';
 import { humanizeBytes } from '@/utils/humanizeBytes';
+import { normalizeTitle } from '@/utils/normalizeTitle';
 
 const BASE_URL = 'https://odd-bird-1319.zwuhygoaqe.workers.dev';
 const SERIES_URL = `${BASE_URL}/tvs`;
@@ -80,12 +81,13 @@ async function execute({
 			throw new Error('No stream found');
 		}
 
-		const episodes = allEpisodes.filter((e) =>
-			e.url.includes(
-				`S${trailingZero(titleInfo?.season || 1)}E${trailingZero(
-					titleInfo?.episode || 1
-				)}`
-			)
+		const episodes = allEpisodes.filter(
+			(e) =>
+				e.url.includes(
+					`S${trailingZero(titleInfo?.season || 1)}E${trailingZero(
+						titleInfo?.episode || 1
+					)}`
+				) || e.url.includes(normalizeTitle(titleInfo.title))
 		);
 
 		return episodes;

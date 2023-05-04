@@ -66,9 +66,10 @@ export async function titleInfo({
 		year: title.original_release_year,
 		id: title.id,
 		type: title.object_type,
-		imdbID: title.external_ids.find((provider: any) => provider === 'imdb')
+		imdbID: title.external_ids.find(({ provider }: any) => provider === 'imdb')
 			?.external_id,
-		tmdbID: title.external_ids.find((provider: any) => provider === 'tmdb'),
+		tmdbID: title.external_ids.find(({ provider }: any) => provider === 'tmdb')
+			?.external_id,
 		seasons: title.seasons?.map((season: any) => {
 			return {
 				id: season.id,

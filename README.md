@@ -1,6 +1,6 @@
 # movie-scraper
 
-<img src="img/demo.gif" />
+<video src="./assets/demo.mp4"></video>
 
 ## Description
 

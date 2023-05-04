@@ -19,10 +19,9 @@ export async function searchMovies() {
 	try {
 		searchResults = await searchTitles({ query });
 	} catch (err) {
-		if (err instanceof Error) {
-			console.log(error(err.message));
-			process.exit(0);
-		}
+		if (!(err instanceof Error)) return;
+		console.log(error(err.message));
+		process.exit(0);
 	}
 
 	const { movie } = await prompts({

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
 export function config(): any {
-	let secrets = {};
+	let secrets: any = {};
 	if (fs.existsSync('.env')) {
 		const envFile = fs.readFileSync('.env', 'utf8');
 		const envVars = envFile.split('\n').reduce(
@@ -20,8 +20,10 @@ export function config(): any {
 			{}
 		);
 		secrets = envVars;
-	} else {
-		secrets = process.env;
+	}
+
+	for (const key in process.env) {
+		secrets[key] = process.env[key];
 	}
 
 	return secrets;

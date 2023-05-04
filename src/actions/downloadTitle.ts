@@ -4,7 +4,8 @@ import chalk from 'chalk';
 
 import { getProviders, MediaType } from '../provider';
 import { titleInfo, getSeason } from '@/utils/titleInfo';
-import { openInBrowser } from '@/utils/openInBrowser';
+import { openFile } from '@/utils/openFile';
+import { config } from 'config';
 
 // Providers
 import '@/providers/HDwatched';
@@ -23,9 +24,6 @@ const error = chalk.bold.red;
 const success = chalk.bold.green;
 const info = chalk.bold;
 
-// Timeout in milliseconds
-const TIMEOUT_MS = 20000;
-
 export async function downloadMovie({
 	id,
 	type,
@@ -36,7 +34,11 @@ export async function downloadMovie({
 	const providers = getProviders();
 
 	const selectedTitle = await titleInfo({ id, type }).catch((err) => {
-		console.log(error(err.message));
+		if (config().DEBUG_MODE === 'true') {
+			console.log(err.stack);
+		} else {
+			console.log(error(err.message));
+		}
 		process.exit(1);
 	});
 
@@ -110,10 +112,9 @@ export async function downloadMovie({
 				}`
 			);
 		} catch (err) {
-			if (err instanceof Error) {
-				console.log(error(err.message));
-				process.exit(0);
-			}
+			if (!(err instanceof Error)) return;
+			console.log(error(err.message));
+			process.exit(0);
 		}
 	} else {
 		console.log(error('Invalid type'));
@@ -158,8 +159,8 @@ export async function downloadMovie({
 				}),
 				new Promise((_, reject) => {
 					setTimeout(() => {
-						reject(new Error(`Timeout reached ${TIMEOUT_MS}ms`));
-					}, TIMEOUT_MS);
+						reject(new Error(`Timeout reached ${config().TIMEOUT_MS}ms`));
+					}, config().TIMEOUT_MS);
 				}),
 			]);
 
@@ -171,15 +172,17 @@ export async function downloadMovie({
 				throw new Error('No stream found');
 			}
 		} catch (err) {
-			if (err instanceof Error) {
-				progress.update(1, { status: error(err.message) });
-				progressBar.stop();
-				if (
-					err.message !== 'No stream found' &&
-					!err.message.startsWith('Timeout reached')
-				) {
-					// Un-comment to debug
-					// console.log(err.stack);
+			if (!(err instanceof Error)) return;
+			progress.update(1, { status: error(err.message) });
+			progressBar.stop();
+			if (
+				err.message !== 'No stream found' &&
+				!err.message.startsWith('Timeout reached')
+			) {
+				if (config().DEBUG_MODE === 'true') {
+					console.log(err.stack);
+				} else {
+					console.log(error(err.message));
 				}
 			}
 		} finally {
@@ -208,7 +211,7 @@ export async function downloadMovie({
 					],
 				});
 				if (selectedStream !== 'skip') {
-					openInBrowser(selectedStream);
+					openFile(selectedStream);
 					process.exit(0);
 				}
 			}

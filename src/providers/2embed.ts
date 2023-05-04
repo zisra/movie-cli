@@ -1,4 +1,4 @@
-import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+import { registerProvider, TitleInfo, Progress, MediaType } from '../provider';
 
 import Utf8 from 'crypto-js/enc-utf8';
 import Base64 from 'crypto-js/enc-base64';
@@ -124,17 +124,17 @@ async function extractRabbitstream(
 
 async function execute({
 	setProgress,
-	movieInfo,
+	titleInfo,
 }: {
 	setProgress: Progress;
-	movieInfo: MovieInfo;
+	titleInfo: TitleInfo;
 }) {
 	let url: string;
 
-	if (movieInfo.type === MediaType.MOVIE) {
-		url = `${BASE_URL}/embed/imdb/movie?id=${movieInfo.imdbID}`;
+	if (titleInfo.type === MediaType.MOVIE) {
+		url = `${BASE_URL}/embed/imdb/movie?id=${titleInfo.imdbID}`;
 	} else {
-		url = `${BASE_URL}/embed/imdb/tv?id=${movieInfo.imdbID}&s=${movieInfo.season}&e=${movieInfo.episode}`;
+		url = `${BASE_URL}/embed/imdb/tv?id=${titleInfo.imdbID}&s=${titleInfo.season}&e=${titleInfo.episode}`;
 	}
 
 	const embed = await ofetch(url);
@@ -198,6 +198,6 @@ registerProvider({
 	name: '2embed',
 	rank: 5,
 	disabled: false,
-	types: [MediaType.MOVIE, MediaType.SERIES],
+	types: [MediaType.MOVIE, MediaType.SHOW],
 	execute,
 });

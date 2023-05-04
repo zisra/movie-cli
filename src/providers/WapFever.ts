@@ -1,4 +1,4 @@
-import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+import { registerProvider, TitleInfo, Progress, MediaType } from '../provider';
 import { compareTitle } from '@/utils/compareTitle';
 
 import { ofetch } from 'ofetch';
@@ -8,13 +8,13 @@ const BASE_URL = 'https://wapfever.com';
 
 async function execute({
 	setProgress,
-	movieInfo,
+	titleInfo,
 }: {
 	setProgress: Progress;
-	movieInfo: MovieInfo;
+	titleInfo: TitleInfo;
 }) {
 	const search = await ofetch(
-		`${BASE_URL}/search_elastic?s=${movieInfo.title}`
+		`${BASE_URL}/search_elastic?s=${titleInfo.title}`
 	);
 
 	setProgress(0.4);
@@ -42,14 +42,14 @@ async function execute({
 		if (!res.title || !res.href) {
 			throw new Error('No stream found');
 		}
-		return compareTitle(res.title, movieInfo.title);
+		return compareTitle(res.title, titleInfo.title);
 	});
 
 	if (!result?.href) {
 		throw new Error('No stream found');
 	}
 
-	if (movieInfo.type === MediaType.MOVIE) {
+	if (titleInfo.type === MediaType.MOVIE) {
 		const video = await ofetch(result.href.replace('details', 'watch'));
 
 		setProgress(0.7);
@@ -58,7 +58,7 @@ async function execute({
 
 		return [
 			{
-				url: videoDocument('source').attr('src'),
+				url: videoDocument('source').attr('src')?.toString() ?? '',
 				quality: 'Unknown',
 			},
 		];
@@ -77,7 +77,7 @@ async function execute({
 					title: seasonsDocument(item).attr('title'),
 				};
 			})
-			.find((season) => season.title === `Season ${movieInfo.season}`);
+			.find((season) => season.title === `Season ${titleInfo.season}`);
 
 		if (!season?.href) {
 			throw new Error('No stream found');
@@ -97,7 +97,7 @@ async function execute({
 					title: seasonsDocument(item).attr('title') ?? '',
 				};
 			})
-			.find((episode) => episode.title.startsWith(`E${movieInfo.episode}`));
+			.find((episode) => episode.title.startsWith(`E${titleInfo.episode}`));
 
 		if (!episode) {
 			throw new Error('No stream found');
@@ -111,7 +111,7 @@ async function execute({
 
 		return [
 			{
-				url: videoDocument('source').attr('src')?.toString(),
+				url: videoDocument('source').attr('src')?.toString() ?? '',
 				quality: 'Unknown',
 			},
 		];
@@ -121,7 +121,7 @@ async function execute({
 registerProvider({
 	name: 'WapFever',
 	rank: 8,
-	types: [MediaType.MOVIE, MediaType.SERIES],
+	types: [MediaType.MOVIE, MediaType.SHOW],
 	disabled: false,
 	execute,
 });

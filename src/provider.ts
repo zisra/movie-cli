@@ -1,8 +1,15 @@
-export interface MovieInfo {
+export interface TitleInfo {
 	title: string;
-	type: 'movie' | 'series';
 	year: number;
-	imdbID: string;
+	id: number;
+	type: MediaType;
+	imdbID?: string;
+	tmdbID?: string;
+	seasons: {
+		id: number;
+		number: number;
+		title: string;
+	}[];
 	season?: number;
 	episode?: number;
 }
@@ -11,7 +18,7 @@ export type Progress = (updatedProgress: number) => void;
 
 export enum MediaType {
 	MOVIE = 'movie',
-	SERIES = 'series',
+	SHOW = 'show',
 }
 
 export interface Provider {
@@ -21,10 +28,10 @@ export interface Provider {
 	only?: boolean;
 	types: MediaType[];
 	execute: ({
-		movieInfo,
+		titleInfo,
 		setProgress,
 	}: {
-		movieInfo: MovieInfo;
+		titleInfo: TitleInfo;
 		setProgress: Progress;
 	}) => Promise<{ quality: number | string; url: string }[]>;
 }

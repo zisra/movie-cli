@@ -1,6 +1,6 @@
 {
 	"name": "movie-cli",
-	"version": "2.0.0",
+	"version": "1.0.0",
 	"description": "CLI app that scrapes movies and shows from multiple sources and allows you to download them",
 	"main": "src/index.ts",
 	"repository": {

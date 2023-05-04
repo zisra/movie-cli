@@ -1,4 +1,4 @@
-import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+import { registerProvider, TitleInfo, Progress, MediaType } from '../provider';
 import { compareTitle } from '@/utils/compareTitle';
 
 import { ofetch } from 'ofetch';
@@ -8,10 +8,10 @@ const BASE_URL = 'https://xemovie.net';
 
 async function execute({
 	setProgress,
-	movieInfo,
+	titleInfo,
 }: {
 	setProgress: Progress;
-	movieInfo: MovieInfo;
+	titleInfo: TitleInfo;
 }) {
 	const homepage = await ofetch(BASE_URL);
 
@@ -22,7 +22,7 @@ async function execute({
 	const token = homepageDocument('input[name="_token"]').attr('value');
 
 	const searchResults = await ofetch(
-		`${BASE_URL}/search?_token=${token}&q=${movieInfo.title.replace(/ /g, '+')}`
+		`${BASE_URL}/search?_token=${token}&q=${titleInfo.title.replace(/ /g, '+')}`
 	);
 
 	setProgress(0.5);
@@ -35,16 +35,16 @@ async function execute({
 			href: el.attribs.href,
 			title: el.children[1].children[0].data,
 		}))
-		.find((el) => compareTitle(el.title, movieInfo.title));
+		.find((el) => compareTitle(el.title, titleInfo.title));
 
 	if (!searchResult?.href) {
 		throw new Error('No stream found');
 	}
 
 	const url =
-		movieInfo.type === MediaType.MOVIE
+		titleInfo.type === MediaType.MOVIE
 			? `${searchResult.href}/watch`
-			: `${searchResult.href}-season-${movieInfo.season}-episode-${movieInfo.episode}/watch`;
+			: `${searchResult.href}-season-${titleInfo.season}-episode-${titleInfo.episode}/watch`;
 
 	const moviePage = await ofetch(url).catch(() => {
 		throw new Error('No stream found');
@@ -74,7 +74,7 @@ async function execute({
 registerProvider({
 	name: 'XeMovie',
 	rank: 9,
-	types: [MediaType.MOVIE, MediaType.SERIES],
+	types: [MediaType.MOVIE, MediaType.SHOW],
 	disabled: false,
 	execute,
 });

@@ -1,4 +1,4 @@
-import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+import { registerProvider, TitleInfo, Progress, MediaType } from '../provider';
 
 import { ofetch } from 'ofetch';
 import { load } from 'cheerio';
@@ -101,13 +101,13 @@ async function fetchSeries({
 }
 
 async function execute({
-	movieInfo,
+	titleInfo,
 	setProgress,
 }: {
-	movieInfo: MovieInfo;
+	titleInfo: TitleInfo;
 	setProgress: Progress;
 }) {
-	const search = await ofetch(`/search/${movieInfo.imdbID}`, {
+	const search = await ofetch(`/search/${titleInfo.imdbID}`, {
 		baseURL: BASE_URL,
 	});
 
@@ -141,7 +141,7 @@ async function execute({
 	setProgress(0.2);
 
 	const targetSource = searchList.find(
-		(source: any) => source.year === (movieInfo.year ? +movieInfo.year : 0)
+		(source: any) => source.year === (titleInfo.year ? +titleInfo.year : 0)
 	);
 
 	if (!targetSource) {
@@ -150,25 +150,7 @@ async function execute({
 
 	setProgress(0.4);
 
-	if (movieInfo.type === MediaType.SERIES) {
-		const series = await fetchSeries({
-			setProgress,
-			href: targetSource.href,
-			season: movieInfo.season ?? 1,
-			episode: movieInfo.episode ?? 1,
-		});
-
-		if (!series?.url || !series?.quality) {
-			throw new Error('No stream found');
-		}
-
-		return [
-			{
-				url: series.url,
-				quality: series.quality,
-			},
-		];
-	} else if (movieInfo.type === MediaType.MOVIE) {
+	if (titleInfo.type === MediaType.MOVIE) {
 		const movie = await fetchMovie({
 			id: targetSource.id,
 		});
@@ -183,12 +165,31 @@ async function execute({
 				quality: movie.quality,
 			},
 		];
+	} else {
+		const series = await fetchSeries({
+			setProgress,
+			href: targetSource.href,
+			season: titleInfo.season ?? 1,
+			episode: titleInfo.episode ?? 1,
+		});
+
+		if (!series?.url || !series?.quality) {
+			throw new Error('No stream found');
+		}
+
+		return [
+			{
+				url: series.url,
+				quality: series.quality,
+			},
+		];
 	}
 }
 
 registerProvider({
 	name: 'HDwatched',
 	rank: 2,
-	types: [MediaType.MOVIE, MediaType.SERIES],
+	types: [MediaType.MOVIE, MediaType.SHOW],
+	disabled: false,
 	execute,
 });

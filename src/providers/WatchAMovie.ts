@@ -1,5 +1,4 @@
-import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
-import { convertId } from '@/utils/movieInfo';
+import { registerProvider, TitleInfo, Progress, MediaType } from '../provider';
 
 import { ofetch } from 'ofetch';
 
@@ -7,22 +6,19 @@ const BASE_URL = 'https://fsa.remotestre.am';
 
 async function execute({
 	setProgress,
-	movieInfo,
+	titleInfo,
 }: {
 	setProgress: Progress;
-	movieInfo: MovieInfo;
+	titleInfo: TitleInfo;
 }) {
-	const tmdbID = await convertId(movieInfo.imdbID).catch(() => {
-		throw new Error('No stream found');
-	});
 	let url: string;
 
 	setProgress(0.5);
 
-	if (movieInfo.type === MediaType.MOVIE) {
-		url = `${BASE_URL}/Movies/${tmdbID}/${tmdbID}.m3u8`;
-	} else if (movieInfo.type === MediaType.SERIES) {
-		url = `${BASE_URL}/Shows/${tmdbID}/${movieInfo.season}/${movieInfo.episode}/${movieInfo.episode}.m3u8`;
+	if (titleInfo.type === MediaType.MOVIE) {
+		url = `${BASE_URL}/Movies/${titleInfo.tmdbID}/${titleInfo.tmdbID}.m3u8`;
+	} else if (titleInfo.type === MediaType.SHOW) {
+		url = `${BASE_URL}/Shows/${titleInfo.tmdbID}/${titleInfo.season}/${titleInfo.episode}/${titleInfo.episode}.m3u8`;
 	} else {
 		throw new Error('Invalid media type');
 	}
@@ -53,7 +49,7 @@ async function execute({
 registerProvider({
 	name: 'WatchAMovie',
 	rank: 4,
-	types: [MediaType.MOVIE, MediaType.SERIES],
+	types: [MediaType.MOVIE, MediaType.SHOW],
 	disabled: false,
 	execute,
 });

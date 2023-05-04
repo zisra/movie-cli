@@ -1,4 +1,4 @@
-import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+import { registerProvider, TitleInfo, Progress, MediaType } from '../provider';
 
 import { ofetch } from 'ofetch';
 import { load } from 'cheerio';
@@ -8,14 +8,14 @@ const SERVER = 'serverf4';
 
 async function execute({
 	setProgress,
-	movieInfo,
+	titleInfo,
 }: {
 	setProgress: Progress;
-	movieInfo: MovieInfo;
+	titleInfo: TitleInfo;
 }) {
 	const document = await ofetch(`${BASE_URL}/imdb.php/`, {
 		query: {
-			imdb: movieInfo.imdbID,
+			imdb: titleInfo.imdbID,
 			server: SERVER,
 		},
 	});

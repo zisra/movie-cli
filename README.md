@@ -1,6 +1,6 @@
 # movie-scraper
 
-<video src="assets/demo.mp4"></video>
+[![asciicast](https://asciinema.org/a/dWWWtKL9lQamYir3IMlfCTEfM.svg)](https://asciinema.org/a/dWWWtKL9lQamYir3IMlfCTEfM)
 
 ## Description
 

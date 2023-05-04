@@ -1,5 +1,5 @@
 import { compareTitle } from '@/utils/compareTitle';
-import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+import { registerProvider, TitleInfo, Progress, MediaType } from '../provider';
 
 import { ofetch } from 'ofetch';
 
@@ -7,13 +7,13 @@ const BASE_URL = 'https://api.consumet.org/meta/tmdb';
 
 async function execute({
 	setProgress,
-	movieInfo,
+	titleInfo,
 }: {
 	setProgress: Progress;
-	movieInfo: MovieInfo;
+	titleInfo: TitleInfo;
 }) {
 	const searchResults = await ofetch(
-		`/${encodeURIComponent(movieInfo.title)}`,
+		`/${encodeURIComponent(titleInfo.title)}`,
 		{
 			baseURL: BASE_URL,
 		}
@@ -27,7 +27,7 @@ async function execute({
 		}
 
 		return (
-			compareTitle(v.title, movieInfo.title) && v.releaseDate == movieInfo.year
+			compareTitle(v.title, titleInfo.title) && v.releaseDate == titleInfo.year
 		);
 	});
 
@@ -38,7 +38,7 @@ async function execute({
 	const mediaInfo = await ofetch(`/info/${foundItem.id}`, {
 		baseURL: BASE_URL,
 		params: {
-			type: movieInfo.type,
+			type: titleInfo.type,
 		},
 	});
 
@@ -50,11 +50,11 @@ async function execute({
 
 	let { episodeId } = mediaInfo;
 
-	if (movieInfo.type === MediaType.MOVIE) {
+	if (titleInfo.type === MediaType.MOVIE) {
 		episodeId = mediaInfo.episodeId;
 	} else {
 		const seasonMedia = mediaInfo.seasons.find(
-			(o: any) => o.season === movieInfo.season
+			(o: any) => o.season === titleInfo.season
 		);
 
 		if (!seasonMedia?.episodes) {
@@ -62,7 +62,7 @@ async function execute({
 		}
 
 		episodeId = seasonMedia.episodes.find(
-			(o: any) => o.episode === movieInfo.episode
+			(o: any) => o.episode === titleInfo.episode
 		).id;
 	}
 
@@ -91,7 +91,7 @@ async function execute({
 
 registerProvider({
 	name: 'FlixHQ',
-	types: [MediaType.MOVIE, MediaType.SERIES],
+	types: [MediaType.MOVIE, MediaType.SHOW],
 	rank: 6,
 	disabled: false,
 	execute,

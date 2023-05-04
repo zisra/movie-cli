@@ -1,4 +1,4 @@
-import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+import { registerProvider, TitleInfo, Progress, MediaType } from '../provider';
 import { compareTitle } from '@/utils/compareTitle';
 
 import { ofetch } from 'ofetch';
@@ -8,13 +8,13 @@ const BASE_URL = 'https://www.mov.onl';
 
 async function execute({
 	setProgress,
-	movieInfo,
+	titleInfo,
 }: {
 	setProgress: Progress;
-	movieInfo: MovieInfo;
+	titleInfo: TitleInfo;
 }) {
 	const search = await ofetch(
-		`${BASE_URL}/feeds/posts/default?alt=json&v=2&max-results=25&q=${movieInfo.title}`
+		`${BASE_URL}/feeds/posts/default?alt=json&v=2&max-results=25&q=${titleInfo.title}`
 	);
 
 	setProgress(0.7);
@@ -38,8 +38,8 @@ async function execute({
 		})
 		.find(
 			(entry: any) =>
-				compareTitle(entry.title, movieInfo.title) &&
-				entry.year == movieInfo.year
+				compareTitle(entry.title, titleInfo.title) &&
+				entry.year == titleInfo.year
 		);
 
 	if (!stream) {

@@ -3,7 +3,7 @@ import prompts from 'prompts';
 import chalk from 'chalk';
 
 import { getProviders, MediaType } from '../provider';
-import { movieInfo, seasonInfo } from '@/utils/movieInfo';
+import { titleInfo, getSeason } from '@/utils/titleInfo';
 import { openInBrowser } from '@/utils/openInBrowser';
 
 // Providers
@@ -26,47 +26,45 @@ const info = chalk.bold;
 // Timeout in milliseconds
 const TIMEOUT_MS = 20000;
 
-export async function downloadMovie({ imdbID }: { imdbID: string }) {
+export async function downloadMovie({
+	id,
+	type,
+}: {
+	id: number;
+	type: MediaType;
+}) {
 	const providers = getProviders();
 
-	let selectedMovie: any;
+	const selectedTitle = await titleInfo({ id, type }).catch((err) => {
+		console.log(error(err.message));
+		process.exit(1);
+	});
 
-	try {
-		selectedMovie = await movieInfo({ imdbID });
-		selectedMovie.imdbID = imdbID;
-	} catch (err) {
-		if (err instanceof Error) {
-			console.log(error(err.message));
-			process.exit(0);
-		}
-	}
-
-	if (selectedMovie.type === MediaType.MOVIE) {
+	if (selectedTitle.type === MediaType.MOVIE) {
 		console.log('');
-		console.log(info(`${selectedMovie.title} • ${selectedMovie.year}`));
-	} else if (selectedMovie.type === MediaType.SERIES) {
+		console.log(info(`${selectedTitle.title} • ${selectedTitle.year}`));
+	} else if (selectedTitle.type === MediaType.SHOW) {
 		try {
 			const { selectedSeason } = await prompts({
 				type: 'number',
 				name: 'selectedSeason',
-				message:
-					selectedMovie.totalSeasons === null
-						? 'No seasons found. Enter season number'
-						: `Season (1-${selectedMovie.totalSeasons})`,
+				message: `Select a season (1 - ${
+					selectedTitle.seasons[selectedTitle.seasons.length - 1].number
+				})`,
 				min: 1,
-				max:
-					selectedMovie.totalSeasons === null
-						? undefined
-						: selectedMovie.totalSeasons,
+				max: selectedTitle.seasons[selectedTitle.seasons.length - 1].number,
 				validate: (value) => (value && value > 0) ?? 'Invalid season',
 			});
 
-			const { episodes } = await seasonInfo({
-				imdbID: imdbID ?? '',
-				season: selectedSeason,
+			const { episodes } = await getSeason({
+				id:
+					selectedTitle.seasons.find(
+						(season: any) => season.number === selectedSeason
+					)?.id ?? 1,
 			});
 
 			let selectedEpisode: any;
+
 			if (episodes === null) {
 				selectedEpisode = await prompts({
 					type: 'number',
@@ -97,24 +95,18 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 				selectedEpisode = selectedEpisode.selectedEpisode;
 			}
 
-			selectedMovie = {
-				type: MediaType.SERIES,
-				title: selectedMovie.title,
-				year: selectedMovie.year.split('–')[0],
-				season: selectedSeason,
-				imdbID,
-				episode:
-					episodes === null
-						? selectedEpisode
-						: episodes
-							.map((e: { title: string }) => e.title)
-							.indexOf(selectedEpisode.title) + 1,
-			};
+			selectedTitle.season = selectedSeason;
+			selectedTitle.episode =
+				episodes === null
+					? selectedEpisode
+					: episodes
+						.map((e: { title: string }) => e.title)
+						.indexOf(selectedEpisode.title) + 1;
 
 			console.log('');
 			console.log(
-				`${selectedMovie.title} • ${selectedMovie.year} • ${
-					selectedEpisode.title || `Episode ${selectedMovie.episode}`
+				`${selectedTitle.title} • ${selectedTitle.year} • ${
+					selectedEpisode.title || `Episode ${selectedTitle.episode}`
 				}`
 			);
 		} catch (err) {
@@ -133,7 +125,7 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 	let sortedProviders = providers
 		.sort((a, b) => a.rank - b.rank)
 		.filter((p) => !p.disabled)
-		.filter((p) => p.types.includes(selectedMovie.type));
+		.filter((p) => p.types.includes(selectedTitle.type));
 
 	if (hasOnlyproviders) {
 		sortedProviders = sortedProviders.filter((p) => p.only);
@@ -142,7 +134,7 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 	const progressBar = new MultiBar(
 		{
 			clearOnComplete: false,
-			format: '\033[0m{bar} | {percentage}% | {provider} | {status}',
+			format: '\x1b[0m{bar} | {percentage}% | {provider} | {status}',
 			emptyOnZero: true,
 			autopadding: true,
 		},
@@ -159,7 +151,7 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 		try {
 			result = await Promise.race([
 				provider.execute({
-					movieInfo: selectedMovie,
+					titleInfo: selectedTitle,
 					setProgress: (updatedProgress) => {
 						progress.update(updatedProgress);
 					},
@@ -170,6 +162,14 @@ export async function downloadMovie({ imdbID }: { imdbID: string }) {
 					}, TIMEOUT_MS);
 				}),
 			]);
+
+			if (
+				!result?.find(
+					(item: { url: string; quality: number | string }) => item?.url
+				)
+			) {
+				throw new Error('No stream found');
+			}
 		} catch (err) {
 			if (err instanceof Error) {
 				progress.update(1, { status: error(err.message) });

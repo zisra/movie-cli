@@ -1,4 +1,4 @@
-import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+import { registerProvider, TitleInfo, Progress, MediaType } from '../provider';
 import { compareTitle } from '@/utils/compareTitle';
 import { btoa } from '@/utils/base64';
 
@@ -82,16 +82,16 @@ const get = async (data: Record<string, unknown>, altApi = false) => {
 
 async function execute({
 	setProgress,
-	movieInfo,
+	titleInfo,
 }: {
 	setProgress: Progress;
-	movieInfo: MovieInfo;
+	titleInfo: TitleInfo;
 }) {
 	const searchQuery = {
 		module: 'Search3',
 		page: '1',
 		type: 'all',
-		keyword: movieInfo.title,
+		keyword: titleInfo.title,
 		pagelimit: '20',
 	};
 	const searchRes = (await get(searchQuery, true)).data;
@@ -100,7 +100,7 @@ async function execute({
 
 	const superstreamEntry = searchRes.find(
 		(res: any) =>
-			compareTitle(res.title, movieInfo.title) && res.year == movieInfo.year
+			compareTitle(res.title, titleInfo.title) && res.year == titleInfo.year
 	);
 
 	if (!superstreamEntry) {
@@ -109,7 +109,7 @@ async function execute({
 
 	const superstreamId = superstreamEntry.id;
 
-	if (movieInfo.type === MediaType.MOVIE) {
+	if (titleInfo.type === MediaType.MOVIE) {
 		const apiQuery = {
 			uid: '',
 			module: 'Movie_downloadurl_v3',
@@ -131,13 +131,13 @@ async function execute({
 					item.real_quality === '4K' ? '4k' : parseInt(item.real_quality),
 				url: item.path,
 			}));
-	} else if (movieInfo.type === MediaType.SERIES) {
+	} else if (titleInfo.type === MediaType.SHOW) {
 		const apiQuery = {
 			uid: '',
 			module: 'TV_downloadurl_v3',
 			tid: superstreamId,
-			season: movieInfo.season,
-			episode: movieInfo.episode,
+			season: titleInfo.season,
+			episode: titleInfo.episode,
 			oss: '1',
 			group: '',
 		};
@@ -162,7 +162,7 @@ async function execute({
 
 registerProvider({
 	name: 'SuperStream',
-	types: [MediaType.MOVIE, MediaType.SERIES],
+	types: [MediaType.MOVIE, MediaType.SHOW],
 	rank: 1,
 	disabled: false,
 	execute,

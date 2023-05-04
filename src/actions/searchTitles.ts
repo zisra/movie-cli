@@ -1,5 +1,5 @@
-import { downloadMovie } from './downloadMovie';
-import { searchMovie } from '@/utils/movieInfo';
+import { downloadMovie } from './downloadTitle';
+import { searchTitles } from '@/utils/titleInfo';
 import { capitalizeFirstLetter } from '@/utils/capitalizeFirstLetter';
 
 import prompts from 'prompts';
@@ -11,13 +11,13 @@ export async function searchMovies() {
 	const { query } = await prompts({
 		type: 'text',
 		name: 'query',
-		message: 'Enter a movie or series name',
+		message: 'Enter a movie or show name',
 	});
 
-	let movies: any;
+	let searchResults: any;
 
 	try {
-		movies = await searchMovie({ query });
+		searchResults = await searchTitles({ query });
 	} catch (err) {
 		if (err instanceof Error) {
 			console.log(error(err.message));
@@ -29,14 +29,14 @@ export async function searchMovies() {
 		type: 'autocomplete',
 		name: 'movie',
 		message: 'Select a movie',
-		choices: movies
+		choices: searchResults
 			.filter((result: { type: string }) => {
-				return result.type === 'movie' || result.type === 'series';
+				return result.type === 'movie' || result.type === 'show';
 			})
 			.map((movie: any) => {
 				return {
 					title: `${movie.title} • ${capitalizeFirstLetter(movie.type)} • ${
-						movie.year
+						movie.year ?? 'Unknown'
 					}`,
 					value: movie,
 				};
@@ -49,5 +49,5 @@ export async function searchMovies() {
 			),
 	});
 
-	downloadMovie({ imdbID: movie.imdbID });
+	downloadMovie({ id: movie.id, type: movie.type });
 }

@@ -1,4 +1,4 @@
-import { registerProvider, MovieInfo, Progress, MediaType } from '../provider';
+import { registerProvider, TitleInfo, Progress, MediaType } from '../provider';
 import { trailingZero } from '@/utils/trailingZero';
 import { humanizeBytes } from '@/utils/humanizeBytes';
 
@@ -11,15 +11,46 @@ import { load } from 'cheerio';
 
 async function execute({
 	setProgress,
-	movieInfo,
+	titleInfo,
 }: {
 	setProgress: Progress;
-	movieInfo: MovieInfo;
+	titleInfo: TitleInfo;
 }) {
-	if (movieInfo.type === MediaType.SERIES) {
+	if (titleInfo.type === MediaType.MOVIE) {
+		const movieUrl = `${MOVIE_URL}/${encodeURIComponent(titleInfo.title)}%20(${
+			titleInfo.year
+		})/`;
+
+		let moviesDocument;
+
+		try {
+			moviesDocument = await ofetch(movieUrl);
+		} catch (err) {
+			throw new Error('No stream found');
+		}
+
+		setProgress(0.5);
+
+		const $ = load(moviesDocument);
+
+		const streams = $('.file > td > span > a')
+			.toArray()
+			.map((el) => {
+				return {
+					url: movieUrl + el.attribs.href,
+					quality: humanizeBytes(
+						el.parent?.parent?.parent?.children.find(
+							(el) => el?.attribs?.['data-order']
+						)?.attribs['data-order']
+					),
+				};
+			});
+
+		return streams;
+	} else {
 		const episodesUrl = `${SERIES_URL}/${encodeURIComponent(
-			movieInfo.title
-		)}/${encodeURIComponent(`Season ${movieInfo.season}`)}/`;
+			titleInfo.title
+		)}/${encodeURIComponent(`Season ${titleInfo.season}`)}/`;
 
 		let episodesDocument;
 
@@ -51,51 +82,20 @@ async function execute({
 
 		const episodes = allEpisodes.filter((e) =>
 			e.url.includes(
-				`S${trailingZero(movieInfo?.season || 1)}E${trailingZero(
-					movieInfo?.episode || 1
+				`S${trailingZero(titleInfo?.season || 1)}E${trailingZero(
+					titleInfo?.episode || 1
 				)}`
 			)
 		);
 
 		return episodes;
-	} else if (movieInfo.type === MediaType.MOVIE) {
-		const movieUrl = `${MOVIE_URL}/${encodeURIComponent(movieInfo.title)}%20(${
-			movieInfo.year
-		})/`;
-
-		let moviesDocument;
-
-		try {
-			moviesDocument = await ofetch(movieUrl);
-		} catch (err) {
-			throw new Error('No stream found');
-		}
-
-		setProgress(0.5);
-
-		const $ = load(moviesDocument);
-
-		const streams = $('.file > td > span > a')
-			.toArray()
-			.map((el) => {
-				return {
-					url: movieUrl + el.attribs.href,
-					quality: humanizeBytes(
-						el.parent?.parent?.parent?.children.find(
-							(el) => el?.attribs?.['data-order']
-						)?.attribs['data-order']
-					),
-				};
-			});
-
-		return streams;
 	}
 }
 
 registerProvider({
 	name: 'Moo',
 	rank: 3,
-	types: [MediaType.MOVIE, MediaType.SERIES],
+	types: [MediaType.MOVIE, MediaType.SHOW],
 	disabled: false,
 	execute,
 });

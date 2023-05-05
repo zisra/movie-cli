@@ -87,7 +87,7 @@ async function execute({
 					`S${trailingZero(titleInfo?.season || 1)}E${trailingZero(
 						titleInfo?.episode || 1
 					)}`
-				) || e.url.includes(normalizeTitle(titleInfo.title))
+				) || normalizeTitle(e.url).includes(normalizeTitle(titleInfo.title))
 		);
 
 		return episodes;

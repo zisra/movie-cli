@@ -144,7 +144,9 @@ export async function downloadMovie({
 				}),
 				new Promise((_, reject) => {
 					setTimeout(() => {
-						reject(new Error(`Timeout reached ${config().TIMEOUT_MS}ms`));
+						if (config().DEBUG_MODE !== 'true') {
+							reject(new Error(`Timeout reached ${config().TIMEOUT_MS}ms`));
+						}
 					}, config().TIMEOUT_MS);
 				}),
 			]);

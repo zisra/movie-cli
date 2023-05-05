@@ -131,5 +131,4 @@ registerProvider({
 	types: [MediaType.MOVIE, MediaType.SHOW],
 	disabled: false,
 	execute,
-	only: true,
 });

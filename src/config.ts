@@ -24,7 +24,7 @@ export function config(): any {
 
 	for (const key in process.env) {
 		secrets[key] = process.env[key];
-	}
+	} 
 
 	return secrets;
 }

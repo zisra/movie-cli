@@ -54,8 +54,8 @@ async function execute({
 
 	const moviePageDocument = load(moviePage);
 
-	const streamUrl = moviePageDocument('script[type="text/javascript"]')
-		.last()
+	const streamUrl = moviePageDocument('#player')
+		.next()
 		.text()
 		.match(/"playlist":\s*\[\s*{\s*"file":\s*"(.*?)"/)?.[1];
 

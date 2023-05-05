@@ -1,5 +1,6 @@
 import { registerProvider, TitleInfo, Progress, MediaType } from '../provider';
 import { compareTitle } from '@/utils/compareTitle';
+import { normalizeTitle } from '@/utils/normalizeTitle';
 
 import { ofetch } from 'ofetch';
 import { load } from 'cheerio';
@@ -97,7 +98,13 @@ async function execute({
 					title: seasonsDocument(item).attr('title') ?? '',
 				};
 			})
-			.find((episode) => episode.title.startsWith(`E${titleInfo.episode}`));
+			.find(
+				(episode) =>
+					episode.title.startsWith(`E${titleInfo.episode}`) ||
+					normalizeTitle(episode.title).includes(
+						normalizeTitle(titleInfo.episodeTitle)
+					)
+			);
 
 		if (!episode) {
 			throw new Error('No stream found');
@@ -124,4 +131,5 @@ registerProvider({
 	types: [MediaType.MOVIE, MediaType.SHOW],
 	disabled: false,
 	execute,
+	only: true,
 });

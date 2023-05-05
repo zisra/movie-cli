@@ -67,43 +67,28 @@ export async function downloadMovie({
 
 			let selectedEpisode: any;
 
-			if (episodes === null) {
-				selectedEpisode = await prompts({
-					type: 'number',
-					name: 'selectedEpisode',
-					message: 'No episodes found. Enter episode number',
-					validate: (value) => (value && value > 0) ?? 'Invalid episode number',
-				});
+			selectedEpisode = await prompts({
+				type: 'select',
+				name: 'selectedEpisode',
+				message: 'Episode',
+				choices: episodes.map(
+					(
+						episode: {
+							title: string;
+						},
+						index: number
+					) => ({
+						title: `E${index + 1} • ${episode.title}`,
+						value: episode,
+					})
+				),
+			});
 
-				selectedEpisode = selectedEpisode.selectedEpisode;
-			} else {
-				selectedEpisode = await prompts({
-					type: 'select',
-					name: 'selectedEpisode',
-					message: 'Episode',
-					choices: episodes.map(
-						(
-							episode: {
-								title: string;
-							},
-							index: number
-						) => ({
-							title: `E${index + 1} • ${episode.title}`,
-							value: episode,
-						})
-					),
-				});
-
-				selectedEpisode = selectedEpisode.selectedEpisode;
-			}
+			selectedEpisode = selectedEpisode.selectedEpisode;
 
 			selectedTitle.season = selectedSeason;
-			selectedTitle.episode =
-				episodes === null
-					? selectedEpisode
-					: episodes
-						.map((e: { title: string }) => e.title)
-						.indexOf(selectedEpisode.title) + 1;
+			selectedTitle.episodeTitle = selectedEpisode.title;
+			selectedTitle.episode = selectedEpisode.number;
 
 			console.log('');
 			console.log(
@@ -159,7 +144,9 @@ export async function downloadMovie({
 				}),
 				new Promise((_, reject) => {
 					setTimeout(() => {
-						reject(new Error(`Timeout reached ${config().TIMEOUT_MS}ms`));
+						if (config().DEBUG_MODE !== 'true') {
+							reject(new Error(`Timeout reached ${config().TIMEOUT_MS}ms`));
+						}
 					}, config().TIMEOUT_MS);
 				}),
 			]);
@@ -175,15 +162,9 @@ export async function downloadMovie({
 			if (!(err instanceof Error)) return;
 			progress.update(1, { status: error(err.message) });
 			progressBar.stop();
-			if (
-				err.message !== 'No stream found' &&
-				!err.message.startsWith('Timeout reached')
-			) {
-				if (config().DEBUG_MODE === 'true') {
-					console.log(err.stack);
-				} else {
-					console.log(error(err.message));
-				}
+
+			if (config().DEBUG_MODE === 'true') {
+				console.log(err.stack);
 			}
 		} finally {
 			if (result) {

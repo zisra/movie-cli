@@ -64,7 +64,7 @@ async function execute({
 
 registerProvider({
 	name: 'ServerF4',
-	rank: 100,
+	rank: 4,
 	types: [MediaType.MOVIE],
 	disabled: true,
 	execute,

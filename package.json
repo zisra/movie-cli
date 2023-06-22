@@ -15,7 +15,8 @@
 		"start": "tsx ./src/index.ts",
 		"lint": "eslint ./src/**/*.ts",
 		"lint:fix": "eslint ./src/**/*.ts --fix",
-		"refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
+		"refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
+		"test": "npx tsx ./test.ts"
 	},
 	"type": "module",
 	"author": "Isra",
@@ -27,7 +28,8 @@
 		"crypto-js": "^4.1.1",
 		"nanoid": "^4.0.2",
 		"ofetch": "^1.0.1",
-		"prompts": "^2.4.2"
+		"prompts": "^2.4.2",
+		"unzipit": "^1.4.3"
 	},
 	"devDependencies": {
 		"@types/cli-progress": "^3.11.0",

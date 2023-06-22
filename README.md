@@ -29,7 +29,7 @@ The file format is either `mp4`, `m3u8`, or `mkv`, depending on the source. Play
 You can change options in the `.env` file in the root directory or set the environment variables. Possible options are:
 
 ```sh
-DOWNLOAD_COMMAND=open -a IINA <url> # Command to run with the download link. '<url>' will be be automatically replaced with the download link
+DOWNLOAD_COMMAND=open -a IINA '<url>' # Command to run with the download link. '<url>' will be be automatically replaced with the download link
 DEBUG_MODE=true # Log complete error messages
 TIMEOUT_MS=10000 # Timeout for each scraper in milliseconds
 ```

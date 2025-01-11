@@ -9,8 +9,8 @@
 ## Installation
 
 ```
-git clone https://github.com/zisra/movie-scraper
-cd movie-scraper
+git clone https://github.com/zisra/movie-cli
+cd movie-cli
 npm install
 ```
 
